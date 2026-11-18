@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>جامعة اللوتس | بوابة أنظمة شئون الطلاب</title>
+<link rel="icon" href="logo.png">
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.rtl.min.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
+
+<style>
+:root{
+  --bg1:#0a1330;
+  --bg2:#10224f;
+  --gold:#f5c451;
+  --gold2:#ffe29a;
+  --pink:#ff7eb6;
+  --teal:#2ee6c5;
+  --blue:#4d8dff;
+  --card:rgba(255,255,255,.07);
+  --card-border:rgba(255,255,255,.14);
+  --text:#eef3ff;
+  --muted:#a9b6d9;
+}
+*{box-sizing:border-box}
+html,body{min-height:100%}
+body{
+  font-family:'Cairo',system-ui,-apple-system,'Segoe UI',Tahoma,sans-serif;
+  color:var(--text);
+  background:linear-gradient(160deg,var(--bg1),var(--bg2) 55%,#1a1346);
+  background-attachment:fixed;
+  overflow-x:hidden;
+}
+
+/* ---------- animated background ---------- */
+#bg{position:fixed;inset:0;z-index:0;pointer-events:none}
+.blob{
+  position:fixed;border-radius:50%;filter:blur(80px);opacity:.35;z-index:0;pointer-events:none;
+  animation:float 14s ease-in-out infinite;
+}
+.blob.b1{width:340px;height:340px;background:var(--blue);top:-80px;right:-60px}
+.blob.b2{width:300px;height:300px;background:var(--pink);bottom:-80px;left:-60px;animation-delay:-5s}
+.blob.b3{width:240px;height:240px;background:var(--teal);top:45%;left:35%;opacity:.18;animation-delay:-9s}
+@keyframes float{
+  0%,100%{transform:translate(0,0) scale(1)}
+  50%{transform:translate(30px,-40px) scale(1.12)}
+}
+
+main,header{position:relative;z-index:1}
+
+/* ---------- header ---------- */
+.hero{
+  padding:2.2rem 1rem 3.4rem;
+  text-align:center;
+  position:relative;
+}
+.logo-wrap{
+  position:relative;
+  width:112px;height:112px;margin:0 auto 1rem;
+  display:grid;place-items:center;
+  animation:dropIn .9s cubic-bezier(.2,.9,.3,1.3) both;
+}
+.logo-wrap::before,.logo-wrap::after{
+  content:"";position:absolute;inset:-8px;border-radius:50%;
+  border:2px solid transparent;
+  background:conic-gradient(from 0deg,var(--gold),var(--pink),var(--teal),var(--blue),var(--gold)) border-box;
+  -webkit-mask:linear-gradient(#000 0 0) padding-box exclude,linear-gradient(#000 0 0);
+  -webkit-mask-composite:xor;mask-composite:exclude;
+  animation:spin 7s linear infinite;
+}
+.logo-wrap::after{inset:-18px;opacity:.35;animation-duration:12s;animation-direction:reverse}
+.logo-core{
+  width:100%;height:100%;border-radius:50%;
+  background:radial-gradient(circle at 30% 25%,#fff,#e9efff);
+  display:grid;place-items:center;overflow:hidden;
+  box-shadow:0 0 0 4px rgba(255,255,255,.12),0 10px 40px rgba(245,196,81,.35);
+  animation:pulse 3.2s ease-in-out infinite;
+}
+.logo-core img{width:82%;height:82%;object-fit:contain}
+.logo-core svg{width:70%;height:70%}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 4px rgba(255,255,255,.12),0 10px 40px rgba(245,196,81,.30)}50%{box-shadow:0 0 0 8px rgba(255,255,255,.06),0 10px 60px rgba(245,196,81,.6)}}
+@keyframes dropIn{from{opacity:0;transform:translateY(-40px) scale(.6)}to{opacity:1;transform:none}}
+
+.uni-name{
+  font-weight:900;
+  font-size:clamp(1.9rem,5.2vw,3.1rem);
+  line-height:1.2;margin:0;
+  background:linear-gradient(100deg,var(--gold2) 0%,#fff 25%,var(--gold) 50%,#fff 75%,var(--gold2) 100%);
+  background-size:250% auto;
+  -webkit-background-clip:text;background-clip:text;color:transparent;
+  animation:shine 5s linear infinite,fadeUp .9s .25s both;
+  text-shadow:0 0 30px rgba(245,196,81,.25);
+}
+@keyframes shine{to{background-position:-250% center}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(22px)}to{opacity:1;transform:none}}
+
+.subtitle{
+  color:var(--muted);font-size:clamp(.95rem,2.2vw,1.1rem);
+  margin:.35rem 0 1rem;animation:fadeUp .9s .45s both;
+}
+.designer{
+  display:inline-flex;align-items:center;gap:.65rem;
+  padding:.5rem 1.2rem .5rem 1.4rem;
+  border-radius:999px;
+  background:linear-gradient(135deg,rgba(245,196,81,.18),rgba(255,126,182,.14));
+  border:1px solid rgba(245,196,81,.45);
+  backdrop-filter:blur(8px);
+  font-weight:600;font-size:clamp(.88rem,2.2vw,1rem);
+  position:relative;overflow:hidden;
+  animation:fadeUp .9s .65s both;
+}
+.designer i{color:var(--gold);font-size:1.15rem;animation:twinkle 2.2s ease-in-out infinite}
+.designer b{color:var(--gold2)}
+.designer::after{
+  content:"";position:absolute;top:0;bottom:0;width:60px;left:-80px;
+  background:linear-gradient(100deg,transparent,rgba(255,255,255,.35),transparent);
+  transform:skewX(-20deg);animation:sweep 4s 1.5s ease-in-out infinite;
+}
+@keyframes sweep{0%{left:-80px}55%,100%{left:120%}}
+@keyframes twinkle{0%,100%{transform:scale(1) rotate(0)}50%{transform:scale(1.3) rotate(20deg)}}
+
+.wave{position:absolute;bottom:-1px;left:0;width:100%;height:46px;display:block}
+.wave path{fill:rgba(255,255,255,.05)}
+
+/* ---------- section ---------- */
+.section-title{
+  text-align:center;font-weight:700;font-size:1.15rem;margin:0 0 1.4rem;color:var(--muted);
+}
+.section-title span{
+  color:var(--text);position:relative;padding:0 .4rem;
+}
+.section-title span::after{
+  content:"";position:absolute;right:0;left:0;bottom:-6px;height:3px;border-radius:3px;
+  background:linear-gradient(90deg,var(--gold),var(--pink),var(--teal));
+}
+
+.grid{
+  display:flex;flex-wrap:wrap;justify-content:center;gap:1.35rem;
+  max-width:1260px;margin:0 auto;padding:0 1rem 2.8rem;
+  perspective:900px;
+}
+
+/* ---------- compact cards ---------- */
+.sys-card{
+  --c1:var(--blue);--c2:var(--teal);
+  --mx:50%;--my:50%;
+  width:236px;
+  position:relative;
+  display:flex;flex-direction:column;align-items:center;text-align:center;
+  padding:1.7rem 1.2rem 1.3rem;
+  border-radius:24px;
+  background:var(--card);
+  border:1px solid var(--card-border);
+  backdrop-filter:blur(10px);
+  color:var(--text);text-decoration:none;
+  transform-style:preserve-3d;
+  transition:transform .18s ease-out,box-shadow .3s,border-color .3s;
+  opacity:0;animation:cardIn .7s cubic-bezier(.2,.9,.3,1.2) forwards;
+  overflow:hidden;
+}
+.sys-card:nth-child(1){animation-delay:.85s}
+.sys-card:nth-child(2){animation-delay:.97s}
+.sys-card:nth-child(3){animation-delay:1.09s}
+.sys-card:nth-child(4){animation-delay:1.21s}
+.sys-card:nth-child(5){animation-delay:1.33s}
+@keyframes cardIn{from{opacity:0;transform:translateY(40px) scale(.85)}to{opacity:1;transform:none}}
+
+.sys-card::before{ /* cursor glow */
+  content:"";position:absolute;inset:0;
+  background:radial-gradient(160px circle at var(--mx) var(--my),rgba(255,255,255,.2),transparent 60%);
+  opacity:0;transition:opacity .3s;pointer-events:none;
+}
+.sys-card::after{ /* top accent line */
+  content:"";position:absolute;top:0;right:0;left:0;height:3px;
+  background:linear-gradient(90deg,var(--c1),var(--c2));
+  transform:scaleX(.25);transition:transform .4s;
+}
+.sys-card:hover{
+  border-color:rgba(255,255,255,.35);
+  box-shadow:0 14px 34px rgba(0,0,0,.4),0 0 26px color-mix(in srgb,var(--c1) 45%,transparent);
+  color:var(--text);
+}
+.sys-card:hover::before{opacity:1}
+.sys-card:hover::after{transform:scaleX(1)}
+
+.ico{
+  position:relative;
+  width:82px;height:82px;border-radius:26px;
+  display:grid;place-items:center;font-size:2.5rem;color:#fff;
+  background:linear-gradient(135deg,var(--c1),var(--c2));
+  box-shadow:0 10px 26px color-mix(in srgb,var(--c1) 50%,transparent),inset 0 2px 0 rgba(255,255,255,.35);
+  margin-bottom:1.05rem;
+  transition:transform .4s cubic-bezier(.3,1.6,.5,1);
+  transform:translateZ(34px);
+}
+.ico > i{filter:drop-shadow(0 3px 6px rgba(0,0,0,.25))}
+.ico::before{ /* pulsing ring */
+  content:"";position:absolute;inset:-8px;border-radius:32px;
+  border:2px solid var(--c1);opacity:.55;
+  animation:ring 2.8s ease-out infinite;
+}
+@keyframes ring{0%{transform:scale(.92);opacity:.7}100%{transform:scale(1.22);opacity:0}}
+.ico .badge-ico{ /* small companion icon */
+  position:absolute;bottom:-9px;left:-9px;
+  width:32px;height:32px;border-radius:50%;
+  display:grid;place-items:center;font-size:.95rem;
+  background:#fff;color:var(--c1);
+  box-shadow:0 5px 14px rgba(0,0,0,.35);
+  animation:bob 3s ease-in-out infinite;
+}
+.ico .badge-ico i{filter:none}
+@keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-4px)}}
+.sys-card:hover .ico{transform:translateZ(46px) rotate(-6deg) scale(1.1)}
+
+.sys-card h3{font-size:1.22rem;font-weight:800;margin:0 0 .35rem;line-height:1.4}
+.sys-card p{font-size:.85rem;color:var(--muted);margin:0 0 .75rem;line-height:1.65;min-height:3.3em}
+.tags{display:flex;flex-wrap:wrap;justify-content:center;gap:.35rem;margin:0 0 1rem}
+.tag{font-size:.7rem;font-weight:600;padding:.15rem .65rem;border-radius:999px;background:rgba(255,255,255,.09);border:1px solid rgba(255,255,255,.12);color:var(--text)}
+.go{
+  margin-top:auto;font-size:.85rem;font-weight:700;
+  display:inline-flex;align-items:center;gap:.4rem;
+  padding:.4rem 1.1rem;border-radius:999px;
+  background:rgba(255,255,255,.1);
+  transition:background .3s,gap .3s,color .3s;
+}
+.sys-card:hover .go{background:linear-gradient(90deg,var(--c1),var(--c2));gap:.6rem;color:#fff}
+
+.num{
+  position:absolute;top:12px;right:16px;font-size:.8rem;font-weight:700;
+  color:rgba(255,255,255,.35);
+}
+
+/* colour themes */
+.t1{--c1:#4d8dff;--c2:#2ee6c5}
+.t2{--c1:#a66bff;--c2:#ff7eb6}
+.t3{--c1:#34d27b;--c2:#b6f04a}
+.t4{--c1:#ff9a3c;--c2:#ffd04a}
+.t5{--c1:#8d97b5;--c2:#5b6585}
+
+/* coming soon */
+.soon{cursor:not-allowed;filter:saturate(.55)}
+.soon:hover{transform:none!important}
+.ribbon{
+  position:absolute;top:18px;left:-34px;width:128px;text-align:center;
+  background:linear-gradient(90deg,var(--gold),#ff9a3c);color:#2a1a00;
+  font-size:.75rem;font-weight:900;padding:3px 0;
+  transform:rotate(-38deg);box-shadow:0 2px 8px rgba(0,0,0,.35);
+}
+.soon .go{opacity:.7}
+
+/* شاشة كبيرة: الخمس كروت جنب بعض في صف واحد */
+@media (min-width:1180px){
+  .grid{flex-wrap:nowrap;gap:1.1rem}
+  .sys-card{width:auto;flex:1 1 0;min-width:0}
+}
+/* موبايل: كارتين جنب بعض */
+@media (max-width:540px){
+  .grid{gap:.75rem;padding-left:.75rem;padding-right:.75rem}
+  .sys-card{width:calc(50% - .4rem);padding:1.3rem .7rem 1rem;border-radius:20px}
+  .ico{width:62px;height:62px;border-radius:20px;font-size:1.9rem;margin-bottom:.9rem}
+  .ico .badge-ico{width:26px;height:26px;font-size:.78rem;bottom:-7px;left:-7px}
+  .sys-card h3{font-size:1rem}
+  .sys-card p{font-size:.74rem;min-height:4.6em}
+  .tags{display:none}
+  .go{font-size:.76rem;padding:.3rem .8rem}
+  .num{font-size:.7rem;top:9px;right:12px}
+  .ribbon{top:14px;left:-36px;width:112px;font-size:.66rem}
+}
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
+  .sys-card{opacity:1}
+}
+</style>
+</head>
+<body>
+
+<canvas id="bg"></canvas>
+<div class="blob b1"></div><div class="blob b2"></div><div class="blob b3"></div>
+
+<!-- ========== HEADER ========== -->
+<header class="hero">
+  <div class="logo-wrap">
+    <div class="logo-core">
+      <!-- ضع ملف الشعار باسم logo.png بجانب هذا الملف -->
+      <img src="logo.png" alt="شعار جامعة اللوتس" id="logoImg">
+    </div>
+  </div>
+
+  <h1 class="uni-name">جامعة اللوتس</h1>
+  <p class="subtitle">بوابة أنظمة شئون الطلاب</p>
+
+  <div class="designer">
+    <i class="bi bi-stars"></i>
+    <span>تصميم <b>م. بولس سمير</b> &nbsp;|&nbsp; مدير شئون الطلاب</span>
+  </div>
+
+  <svg class="wave" viewBox="0 0 1440 60" preserveAspectRatio="none" aria-hidden="true">
+    <path d="M0,30 C240,70 480,0 720,30 C960,60 1200,10 1440,35 L1440,60 L0,60 Z"/>
+  </svg>
+</header>
+
+<!-- ========== SYSTEMS ========== -->
+<main>
+  <h2 class="section-title"><span>اختر النظام</span></h2>
+
+  <div class="grid" id="grid">
+
+    <a class="sys-card t1" href="https://boles2025.github.io/LUM.SYSTEM.AFFAIRS/index.html" target="_blank" rel="noopener noreferrer">
+      <span class="num">01</span>
+      <div class="ico"><i class="bi bi-mortarboard-fill"></i><span class="badge-ico"><i class="bi bi-award-fill"></i></span></div>
+      <h3>شئون الطلاب</h3>
+      <p>إدارة شئون الطلاب كاملة، سحب الطلاب وحساب الشهادات</p>
+      <div class="tags"><span class="tag">سحب الطلاب</span><span class="tag">الشهادات</span></div>
+      <span class="go">فتح النظام <i class="bi bi-arrow-up-left"></i></span>
+    </a>
+
+    <a class="sys-card t2" href="https://lum20262026.github.io/ReviewFIlesStudent/" target="_blank" rel="noopener noreferrer">
+      <span class="num">02</span>
+      <div class="ico"><i class="bi bi-file-earmark-check-fill"></i><span class="badge-ico"><i class="bi bi-archive-fill"></i></span></div>
+      <h3>مراجعة الملفات</h3>
+      <p>مراجعة استلام ملفات الطلاب وأرشفتها</p>
+      <div class="tags"><span class="tag">مراجعة</span><span class="tag">أرشفة</span></div>
+      <span class="go">فتح النظام <i class="bi bi-arrow-up-left"></i></span>
+    </a>
+
+    <a class="sys-card t3" href="https://lum20262026.github.io/Military/" target="_blank" rel="noopener noreferrer">
+      <span class="num">03</span>
+      <div class="ico"><i class="bi bi-shield-fill-check"></i><span class="badge-ico"><i class="bi bi-star-fill"></i></span></div>
+      <h3>التربية العسكرية</h3>
+      <p>إدارة التربية العسكرية ومتابعة نتائج الطلاب</p>
+      <div class="tags"><span class="tag">النتائج</span><span class="tag">المتابعة</span></div>
+      <span class="go">فتح النظام <i class="bi bi-arrow-up-left"></i></span>
+    </a>
+
+    <a class="sys-card t4" href="https://lum20262026.github.io/StudentId/index.html" target="_blank" rel="noopener noreferrer">
+      <span class="num">04</span>
+      <div class="ico"><i class="bi bi-person-vcard-fill"></i><span class="badge-ico"><i class="bi bi-qr-code-scan"></i></span></div>
+      <h3>تسليم الكارنيهات</h3>
+      <p>تسليم كارنيهات الطلاب ومتابعتها</p>
+      <div class="tags"><span class="tag">تسليم</span><span class="tag">مسح QR</span></div>
+      <span class="go">فتح النظام <i class="bi bi-arrow-up-left"></i></span>
+    </a>
+
+    <!-- عند جاهزية نظام التجنيد: غيّر div إلى a وأضف href و target="_blank" واحذف الكلاس soon والشريط -->
+    <div class="sys-card t5 soon" aria-disabled="true">
+      <span class="ribbon">قريباً</span>
+      <span class="num">05</span>
+      <div class="ico"><i class="bi bi-flag-fill"></i><span class="badge-ico"><i class="bi bi-clock-history"></i></span></div>
+      <h3>إدارة التجنيد</h3>
+      <p>نظام إدارة التجنيد — قيد التجهيز</p>
+      <div class="tags"><span class="tag">قريباً</span></div>
+      <span class="go"><i class="bi bi-hourglass-split"></i> قريباً</span>
+    </div>
+
+  </div>
+</main>
+
+
+<script>
+/* ---- fallback if logo.png is missing: draw a lotus ---- */
+(function(){
+  var img=document.getElementById('logoImg');
+  var box=document.querySelector('.logo-core');
+  if(!img||!box) return;
+  var done=false;
+  function useFallback(){
+    if(done) return; done=true;
+    box.innerHTML=
+    '<svg viewBox="0 0 100 100" aria-label="لوتس">'+
+    '<defs><linearGradient id="lg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ff7eb6"/><stop offset="1" stop-color="#7a5cff"/></linearGradient></defs>'+
+    '<g fill="url(#lg)">'+
+    '<path d="M50 18 C62 34 62 56 50 72 C38 56 38 34 50 18Z"/>'+
+    '<path d="M26 30 C46 36 56 54 52 74 C32 70 22 52 26 30Z" opacity=".85"/>'+
+    '<path d="M74 30 C54 36 44 54 48 74 C68 70 78 52 74 30Z" opacity=".85"/>'+
+    '<path d="M12 50 C32 50 48 62 52 78 C30 80 14 68 12 50Z" opacity=".65"/>'+
+    '<path d="M88 50 C68 50 52 62 48 78 C70 80 86 68 88 50Z" opacity=".65"/>'+
+    '</g><rect x="20" y="82" width="60" height="4" rx="2" fill="#f5c451"/></svg>';
+  }
+  img.addEventListener('error',useFallback);
+  // in case the image already failed before the listener was attached
+  if(img.complete && img.naturalWidth===0) useFallback();
+})();
+
+/* ---- 3D tilt + cursor glow on cards ---- */
+(function(){
+  if(matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  document.querySelectorAll('.sys-card:not(.soon)').forEach(function(card){
+    card.addEventListener('mousemove',function(e){
+      var r=card.getBoundingClientRect();
+      var x=e.clientX-r.left, y=e.clientY-r.top;
+      card.style.setProperty('--mx',x+'px');
+      card.style.setProperty('--my',y+'px');
+      var rx=((y/r.height)-.5)*-12, ry=((x/r.width)-.5)*12;
+      card.style.transform='translateY(-6px) rotateX('+rx+'deg) rotateY('+ry+'deg)';
+    });
+    card.addEventListener('mouseleave',function(){card.style.transform='';});
+  });
+})();
+
+/* ---- floating particles background ---- */
+(function(){
+  if(matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  var c=document.getElementById('bg'), ctx=c.getContext('2d'), W,H,P=[];
+  function size(){
+    var d=window.devicePixelRatio||1;
+    W=c.width=innerWidth*d; H=c.height=innerHeight*d;
+    c.style.width=innerWidth+'px'; c.style.height=innerHeight+'px';
+    var n=Math.min(70,Math.floor(innerWidth/18));
+    P=[];
+    for(var i=0;i<n;i++) P.push({
+      x:Math.random()*W,y:Math.random()*H,
+      r:(Math.random()*1.8+.6)*d,
+      vx:(Math.random()-.5)*.25*d,vy:(Math.random()-.5)*.25*d,
+      g:Math.random()<.25
+    });
+  }
+  function draw(){
+    ctx.clearRect(0,0,W,H);
+    for(var i=0;i<P.length;i++){
+      var p=P[i];
+      p.x+=p.vx;p.y+=p.vy;
+      if(p.x<0)p.x=W;if(p.x>W)p.x=0;if(p.y<0)p.y=H;if(p.y>H)p.y=0;
+      ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,6.283);
+      ctx.fillStyle=p.g?'rgba(245,196,81,.8)':'rgba(255,255,255,.55)';
+      ctx.fill();
+      for(var j=i+1;j<P.length;j++){
+        var q=P[j],dx=p.x-q.x,dy=p.y-q.y,d2=dx*dx+dy*dy,m=130*(window.devicePixelRatio||1);
+        if(d2<m*m){
+          ctx.strokeStyle='rgba(120,160,255,'+(.14*(1-Math.sqrt(d2)/m))+')';
+          ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(p.x,p.y);ctx.lineTo(q.x,q.y);ctx.stroke();
+        }
+      }
+    }
+    requestAnimationFrame(draw);
+  }
+  size();addEventListener('resize',size);draw();
+})();
+</script>
+</body>
+</html>
