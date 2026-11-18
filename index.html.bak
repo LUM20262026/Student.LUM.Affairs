@@ -1,0 +1,1591 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>جامعة اللوتس - النظام المتكامل</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.rtl.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800;900&family=Changa:wght@500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <style>
+        :root {
+            --bg-main: #0f1119;
+            --bg-card: #1a1d2e;
+            --bg-card-alt: #1e2135;
+            --text-primary: #e8eaf0;
+            --text-secondary: #9ca3b8;
+            --text-muted: #6b7280;
+            --border: #2a2d3e;
+            --border-hover: #3a3d50;
+            --accent-blue: #3b82f6;
+            --accent-cyan: #06b6d4;
+            --accent-emerald: #10b981;
+            --accent-amber: #f59e0b;
+            --accent-rose: #f43f5e;
+            --accent-violet: #8b5cf6;
+            --accent-pink: #ec4899;
+            --shadow: 0 4px 6px rgba(0,0,0,0.2);
+            --shadow-lg: 0 10px 25px rgba(0,0,0,0.3);
+            --shadow-xl: 0 20px 50px rgba(0,0,0,0.4);
+            --header-gradient: linear-gradient(135deg, #0f1119 0%, #1a1d2e 50%, #0f1119 100%);
+            --logo-ring-1: #3b82f6;
+            --logo-ring-2: #06b6d4;
+            --logo-ring-3: #8b5cf6;
+            --logo-shadow: 0 8px 30px rgba(59,130,246,0.35);
+            --logo-inner-bg: #1a1d2e;
+        }
+        * { font-family: 'Tajawal', sans-serif; box-sizing: border-box; }
+        html, body { margin: 0; padding: 0; width: 100%; min-height: 100vh; overflow-x: hidden; }
+        body {
+            background: var(--bg-main);
+            color: var(--text-primary);
+            transition: all 0.4s ease;
+            display: flex; flex-direction: column;
+        }
+        ::selection { background: rgba(59,130,246,0.3); color: #fff; }
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: var(--bg-main); }
+        ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--border-hover); }
+
+        /* ── Animated Ring Logo ── */
+        .logo-wrapper {
+            position: relative; width: 70px; height: 70px;
+            display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+        }
+        @media (min-width: 768px) { .logo-wrapper { width: 90px; height: 90px; } }
+        .logo-ring {
+            position: absolute; border-radius: 50%;
+            border: 2px solid transparent;
+            animation: ringRotate 8s linear infinite;
+        }
+        .logo-ring.ring-1 {
+            width: 70px; height: 70px;
+            border-top-color: var(--logo-ring-1);
+            border-right-color: var(--logo-ring-1);
+            animation-duration: 4s;
+        }
+        .logo-ring.ring-2 {
+            width: 60px; height: 60px;
+            border-bottom-color: var(--logo-ring-2);
+            border-left-color: var(--logo-ring-2);
+            animation-duration: 6s;
+            animation-direction: reverse;
+        }
+        .logo-ring.ring-3 {
+            width: 50px; height: 50px;
+            border-top-color: var(--logo-ring-3);
+            border-left-color: var(--logo-ring-3);
+            animation-duration: 5s;
+        }
+        @media (min-width: 768px) {
+            .logo-ring.ring-1 { width: 90px; height: 90px; }
+            .logo-ring.ring-2 { width: 78px; height: 78px; }
+            .logo-ring.ring-3 { width: 66px; height: 66px; }
+        }
+        .logo-inner {
+            width: 44px; height: 44px; border-radius: 50%;
+            background: var(--logo-inner-bg);
+            display: flex; align-items: center; justify-content: center;
+            z-index: 2; box-shadow: var(--logo-shadow);
+            border: 1px solid var(--border); overflow: hidden;
+            transition: all 0.4s cubic-bezier(0.34,1.56,0.64,1);
+        }
+        @media (min-width: 768px) { .logo-inner { width: 56px; height: 56px; } }
+        .logo-inner img { width: 85%; height: 85%; object-fit: contain; position: relative; z-index: 1; }
+        .logo-inner-fallback {
+            display: none; width: 44px; height: 44px; border-radius: 50%;
+            background: linear-gradient(135deg, var(--accent-blue), var(--accent-violet));
+            align-items: center; justify-content: center; font-size: 1rem; color: white;
+        }
+        @media (min-width: 768px) { .logo-inner-fallback { width: 56px; height: 56px; font-size: 1.3rem; } }
+        .logo-wrapper:hover .logo-ring.ring-1 { animation-duration: 1.5s; }
+        .logo-wrapper:hover .logo-ring.ring-2 { animation-duration: 2.5s; }
+        .logo-wrapper:hover .logo-ring.ring-3 { animation-duration: 2s; }
+        .logo-wrapper:hover .logo-inner {
+            box-shadow: 0 15px 45px rgba(59,130,246,0.4);
+            transform: scale(1.06);
+        }
+        @keyframes ringRotate { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+
+        /* ── Hero ── */
+        .hero {
+            background: var(--header-gradient);
+            padding: 16px 20px;
+            position: relative;
+            overflow: hidden;
+            border-bottom: 3px solid transparent;
+            border-image: linear-gradient(90deg, var(--accent-blue), var(--accent-cyan), var(--accent-emerald), var(--accent-amber), var(--accent-violet)) 1;
+        }
+        .hero::before {
+            content: '';
+            position: absolute; inset: 0;
+            background: radial-gradient(ellipse at center, rgba(59,130,246,0.08) 0%, transparent 70%);
+            pointer-events: none;
+        }
+        .hero-inner {
+            display: flex; align-items: center; justify-content: center; gap: 24px;
+            max-width: 1000px; margin: 0 auto; position: relative; z-index: 1;
+        }
+        .hero h1 {
+            font-family: 'Changa', sans-serif;
+            font-size: 1.8rem; font-weight: 800; margin: 0;
+        }
+        .hero h1 span {
+            background: linear-gradient(135deg, var(--accent-cyan), var(--accent-blue), var(--accent-violet));
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+        }
+        .hero p {
+            color: var(--text-secondary); font-size: 0.82rem; margin: 4px 0 0;
+            max-width: 500px;
+        }
+        .hero-badges { margin-top: 6px; display: flex; gap: 6px; flex-wrap: wrap; }
+        .badge-dev {
+            background: rgba(212,175,55,0.12); color: #d4af37;
+            padding: 6px 16px; border-radius: 50px; font-size: 0.72rem; font-weight: 700;
+            border: 1px solid rgba(212,175,55,0.3);
+        }
+
+        .main-container { max-width: 1200px; margin: 0 auto; padding: 12px 16px 40px; flex: 1; width: 100%; display: flex; flex-direction: column; justify-content: center; }
+
+        @keyframes gradientAnim {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .section-title {
+            font-family: 'Changa', sans-serif;
+            font-size: 1.1rem; font-weight: 700; margin-bottom: 12px;
+            text-align: center;
+        }
+        .section-title .accent-line {
+            display: none;
+        }
+
+        /* ── System Cards ── */
+        .systems-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 16px;
+        }
+        .system-card {
+            border-radius: 20px; padding: 22px 22px;
+            transition: all 0.5s cubic-bezier(0.34,1.56,0.64,1);
+            position: relative; overflow: hidden;
+            cursor: pointer; text-decoration: none; display: block;
+            animation: cardAppear 0.6s ease backwards;
+        }
+        .system-card:nth-child(1) { animation-delay: 0.1s; }
+        .system-card:nth-child(2) { animation-delay: 0.25s; }
+        .system-card:nth-child(3) { animation-delay: 0.4s; }
+        @keyframes cardAppear {
+            from { opacity: 0; transform: translateY(30px) scale(0.97); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+
+        /* Card 1 – إدارة الملفات (Blue) */
+        .system-card.card-blue {
+            background: linear-gradient(145deg, #1a1d2e 0%, #1e2440 100%);
+            border: 1px solid rgba(59,130,246,0.25);
+            box-shadow: 0 4px 20px rgba(59,130,246,0.08);
+        }
+        .card-blue .card-icon { background: rgba(59,130,246,0.15); color: var(--accent-blue); }
+        .card-blue .card-badge {
+            background: rgba(59,130,246,0.12); color: var(--accent-blue);
+            border: 1px solid rgba(59,130,246,0.3);
+        }
+
+        /* Card 2 – سحب الملفات (Emerald) */
+        .system-card.card-emerald {
+            background: linear-gradient(145deg, #1a1d2e 0%, #1a2e26 100%);
+            border: 1px solid rgba(16,185,129,0.25);
+            box-shadow: 0 4px 20px rgba(16,185,129,0.08);
+        }
+        .card-emerald .card-icon { background: rgba(16,185,129,0.15); color: var(--accent-emerald); }
+        .card-emerald .card-badge {
+            background: rgba(16,185,129,0.12); color: var(--accent-emerald);
+            border: 1px solid rgba(16,185,129,0.3);
+        }
+
+        /* Card 3 – حساب الشهادات (Amber / Violet) */
+        .system-card.card-violet {
+            background: linear-gradient(145deg, #1a1d2e 0%, #2a1e3a 100%);
+            border: 1px solid rgba(139,92,246,0.25);
+            box-shadow: 0 4px 20px rgba(139,92,246,0.08);
+        }
+        .card-violet .card-icon { background: rgba(139,92,246,0.15); color: var(--accent-violet); }
+        .card-violet .card-badge {
+            background: rgba(139,92,246,0.12); color: var(--accent-violet);
+            border: 1px solid rgba(139,92,246,0.3);
+        }
+
+        /* Card 4 – الخدمات المكتبية (Cyan) */
+        .system-card.card-cyan {
+            background: linear-gradient(145deg, #1a1d2e 0%, #102e3a 100%);
+            border: 1px solid rgba(6,182,212,0.25);
+            box-shadow: 0 4px 20px rgba(6,182,212,0.08);
+        }
+        .card-cyan .card-icon { background: rgba(6,182,212,0.15); color: var(--accent-cyan); }
+        .card-cyan .card-badge {
+            background: rgba(6,182,212,0.12); color: var(--accent-cyan);
+            border: 1px solid rgba(6,182,212,0.3);
+        }
+
+        /* Floating glow per card */
+        .card-blue::after, .card-emerald::after, .card-violet::after, .card-cyan::after {
+            content: '';
+            position: absolute;
+            width: 200px; height: 200px;
+            border-radius: 50%;
+            top: -60px; right: -60px;
+            opacity: 0;
+            transition: opacity 0.6s ease;
+            pointer-events: none;
+        }
+        .card-blue::after { background: radial-gradient(circle, rgba(59,130,246,0.12), transparent 70%); }
+        .card-emerald::after { background: radial-gradient(circle, rgba(16,185,129,0.12), transparent 70%); }
+        .card-violet::after { background: radial-gradient(circle, rgba(139,92,246,0.12), transparent 70%); }
+        .card-cyan::after { background: radial-gradient(circle, rgba(6,182,212,0.12), transparent 70%); }
+        .system-card:hover::after { opacity: 1; }
+
+        .system-card:hover {
+            transform: translateY(-10px) scale(1.01);
+            box-shadow: var(--shadow-xl);
+        }
+        .card-blue:hover { border-color: rgba(59,130,246,0.5); box-shadow: 0 20px 50px rgba(59,130,246,0.15); }
+        .card-emerald:hover { border-color: rgba(16,185,129,0.5); box-shadow: 0 20px 50px rgba(16,185,129,0.15); }
+        .card-violet:hover { border-color: rgba(139,92,246,0.5); box-shadow: 0 20px 50px rgba(139,92,246,0.15); }
+        .card-cyan:hover { border-color: rgba(6,182,212,0.5); box-shadow: 0 20px 50px rgba(6,182,212,0.15); }
+
+        .system-card:active { transform: translateY(-3px) scale(0.99); }
+
+        .card-icon {
+            width: 56px; height: 56px; border-radius: 18px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.5rem; margin-bottom: 16px;
+            transition: all 0.4s cubic-bezier(0.34,1.56,0.64,1);
+        }
+        .system-card:hover .card-icon { transform: scale(1.12) rotate(-8deg); border-radius: 14px; }
+
+        .card-title-text {
+            font-family: 'Changa', sans-serif;
+            font-size: 1.1rem; font-weight: 800; margin: 0 0 8px; color: var(--text-primary);
+            position: relative; z-index: 1;
+        }
+        .card-desc {
+            font-size: 0.82rem; color: var(--text-secondary); line-height: 1.7; margin: 0 0 16px;
+            position: relative; z-index: 1;
+        }
+        .card-footer-row {
+            display: flex; align-items: center; justify-content: space-between;
+            position: relative; z-index: 1;
+        }
+        .card-badge {
+            padding: 5px 14px; border-radius: 50px; font-size: 0.68rem; font-weight: 700;
+            transition: all 0.3s ease;
+        }
+        .system-card:hover .card-badge { transform: scale(1.05); }
+        .card-arrow {
+            color: var(--text-muted); font-size: 1.1rem;
+            transition: all 0.5s cubic-bezier(0.34,1.56,0.64,1); opacity: 0.4;
+        }
+        .system-card:hover .card-arrow { transform: translateX(-8px); opacity: 1; }
+
+        /* Shimmer border on hover */
+        .system-card::before {
+            content: '';
+            position: absolute; inset: -1px;
+            border-radius: 24px;
+            padding: 1px;
+            background: linear-gradient(135deg, transparent 40%, var(--shine-color), transparent 60%);
+            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            -webkit-mask-composite: xor;
+            mask-composite: exclude;
+            opacity: 0;
+            transition: opacity 0.6s ease;
+            pointer-events: none;
+            background-size: 200% 200%;
+            animation: shimmerMove 3s ease infinite;
+        }
+        .card-blue::before { --shine-color: rgba(59,130,246,0.5); }
+        .card-emerald::before { --shine-color: rgba(16,185,129,0.5); }
+        .card-violet::before { --shine-color: rgba(139,92,246,0.5); }
+        .card-cyan::before { --shine-color: rgba(6,182,212,0.5); }
+        @keyframes shimmerMove {
+            0% { background-position: 200% 50%; }
+            100% { background-position: -200% 50%; }
+        }
+        .system-card:hover::before { opacity: 1; }
+
+        /* Auth styles */
+        .user-menu { display:flex; align-items:center; gap:12px; margin-right:auto; background:var(--bg-card); border:1px solid var(--border); border-radius:14px; padding:6px 12px; }
+        .user-menu-info { display:flex; align-items:center; gap:10px; }
+        .user-avatar { width:36px; height:36px; border-radius:50%; background:linear-gradient(135deg,var(--accent-blue),var(--accent-violet)); display:flex; align-items:center; justify-content:center; color:#fff; font-size:0.85rem; }
+        .user-details { display:flex; flex-direction:column; line-height:1.3; }
+        .user-name { font-weight:800; font-size:0.8rem; color:var(--text-primary); }
+        .user-role { font-size:0.65rem; color:var(--text-muted); font-weight:600; }
+        .user-logout-btn { width:32px; height:32px; border-radius:50%; border:1px solid var(--border); background:transparent; color:var(--text-muted); cursor:pointer; display:flex; align-items:center; justify-content:center; transition:all 0.25s; }
+        .user-logout-btn:hover { background:rgba(244,63,94,0.15); color:var(--danger); border-color:var(--danger); }
+        .login-prompt { margin-right:auto; }
+        .btn-login-header { background:linear-gradient(135deg,rgba(59,130,246,0.15),rgba(139,92,246,0.15)); border:1px solid rgba(59,130,246,0.4); color:var(--accent-blue); padding:8px 16px; border-radius:12px; font-weight:700; font-size:0.78rem; cursor:pointer; transition:all 0.3s; }
+        .btn-login-header:hover { background:linear-gradient(135deg,var(--accent-blue),var(--accent-violet)); color:#fff; transform:translateY(-2px); box-shadow:var(--glow-blue); }
+
+        .login-overlay { position:fixed; inset:0; background:rgba(15,17,25,0.95); backdrop-filter:blur(12px); z-index:5000; display:flex; align-items:center; justify-content:center; padding:20px; animation:fadeIn 0.5s ease; }
+        .login-overlay-content { text-align:center; max-width:500px; }
+        .login-overlay-icon { font-size:4rem; color:var(--accent-blue); margin-bottom:16px; opacity:0.8; }
+        .login-overlay-content h2 { font-family:'Changa',sans-serif; font-size:1.8rem; font-weight:800; color:var(--text-primary); margin:0 0 8px; }
+        .login-overlay-content p { color:var(--text-muted); font-size:0.9rem; margin:0 0 8px; }
+        .btn-login-overlay { background:linear-gradient(135deg,var(--accent-blue),var(--accent-violet)); border:none; color:#fff; padding:14px 32px; border-radius:14px; font-weight:700; font-size:0.95rem; cursor:pointer; transition:all 0.3s; font-family:'Tajawal',sans-serif; }
+        .btn-login-overlay:hover { transform:translateY(-3px); box-shadow:0 8px 30px rgba(59,130,246,0.4); }
+        .btn-login-overlay.btn-secondary { background:var(--bg-card); border:2px solid var(--border); color:var(--text-secondary); }
+        .btn-login-overlay.btn-secondary:hover { border-color:var(--accent-blue); color:var(--accent-blue); }
+
+        .modal-overlay { position:fixed; inset:0; background:rgba(0,0,0,0.7); backdrop-filter:blur(6px); z-index:10000; display:none; align-items:center; justify-content:center; padding:16px; }
+        .modal-overlay.active { display:flex; }
+        .modal-box { background:var(--bg-card); border:1px solid var(--border); border-radius:18px; width:100%; max-width:520px; max-height:90vh; overflow:hidden; display:flex; flex-direction:column; box-shadow:var(--shadow-xl); animation:modalPop 0.35s ease forwards; }
+        @keyframes modalPop { from { transform:scale(0.92) translateY(10px); opacity:0; } to { transform:scale(1) translateY(0); opacity:1; } }
+        .modal-header { display:flex; align-items:center; justify-content:space-between; padding:16px 20px; border-bottom:1px solid var(--border); }
+        .modal-header h3 { margin:0; font-size:1rem; font-weight:800; color:var(--text-primary); font-family:'Changa',sans-serif; }
+        .modal-close { background:transparent; border:none; color:var(--text-muted); font-size:1.1rem; cursor:pointer; width:34px; height:34px; border-radius:50%; transition:all 0.25s; }
+        .modal-close:hover { background:rgba(244,63,94,0.15); color:var(--danger); }
+        .modal-body { padding:20px; overflow-y:auto; }
+        .modal-footer { padding:14px 20px; border-top:1px solid var(--border); display:flex; gap:10px; justify-content:flex-end; flex-wrap:wrap; }
+        .subject-label { color:var(--text-label, #e8eaf0); font-weight:700; font-size:0.75rem; display:block; margin-bottom:4px; }
+        .input-main { background:var(--bg-card); border:2px solid var(--border); border-radius:12px; padding:10px 14px; color:var(--text-primary); font-weight:600; font-size:0.82rem; transition:all 0.3s ease; width:100%; outline:none; }
+        .input-main:focus { border-color:var(--accent-blue); box-shadow:0 0 0 5px rgba(59,130,246,0.1); }
+        .btn-action { padding:10px 16px; border-radius:12px; border:2px solid var(--border); background:transparent; color:var(--text-secondary); font-weight:700; font-size:0.78rem; cursor:pointer; transition:all 0.3s; display:inline-flex; align-items:center; gap:6px; font-family:'Tajawal',sans-serif; }
+        .btn-action.btn-save { background:linear-gradient(135deg,var(--accent-blue),var(--accent-violet)); border-color:transparent; color:white; }
+        .mt-3 { margin-top:16px; }
+        .me-1 { margin-left:4px; }
+        .me-2 { margin-left:8px; }
+
+        .footer-animated {
+            text-align: center; padding: 16px 20px;
+            font-size: 0.75rem; font-weight: 700;
+            border-top: 1px solid var(--border);
+            background: var(--bg-card);
+            animation: footerShimmer 4s ease infinite;
+            background-size: 200% 200%;
+        }
+        @keyframes footerShimmer {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        .footer-animated .ft-text {
+            background: linear-gradient(90deg, var(--accent-blue), var(--accent-cyan), var(--accent-emerald), var(--accent-amber), var(--accent-rose), var(--accent-violet), var(--accent-blue));
+            background-size: 300% 100%;
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+            animation: rainbow 6s linear infinite;
+            font-family: 'Changa', sans-serif;
+            letter-spacing: 1px;
+        }
+        @keyframes rainbow {
+            0% { background-position: 0% 50%; }
+            100% { background-position: 300% 50%; }
+        }
+        .footer-animated .ft-icon { display: inline-block; animation: pulseHeart 1.5s ease infinite; }
+        @keyframes pulseHeart {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.15); }
+        }
+
+        @media (max-width: 600px) {
+            .hero { padding: 10px 12px; }
+            .hero-inner { gap: 12px; }
+            .hero h1 { font-size: 1.2rem; }
+            .hero p { font-size: 0.7rem; }
+            .hero-badges { gap: 4px; }
+            .badge-dev { font-size: 0.55rem; padding: 2px 8px; }
+            .logo-wrapper { width: 50px; height: 50px; }
+            .logo-ring.ring-1 { width: 50px; height: 50px; }
+            .logo-ring.ring-2 { width: 42px; height: 42px; }
+            .logo-ring.ring-3 { width: 34px; height: 34px; }
+            .logo-inner { width: 30px; height: 30px; }
+            .logo-inner-fallback { width: 30px; height: 30px; font-size: 0.75rem; }
+            .main-container { padding: 8px 12px 24px; }
+            .section-title { font-size: 0.95rem; margin-bottom: 8px; }
+            .systems-grid { grid-template-columns: 1fr; gap: 12px; }
+            .system-card { padding: 16px 16px; border-radius: 16px; }
+            .card-icon { width: 40px; height: 40px; font-size: 1.1rem; margin-bottom: 10px; }
+            .card-title-text { font-size: 0.95rem; }
+            .card-desc { font-size: 0.75rem; }
+        }
+        @media (max-width: 480px) {
+            .hero-inner { gap: 8px; }
+            .hero h1 { font-size: 1rem; }
+            .hero p { font-size: 0.6rem; }
+            .badge-dev { font-size: 0.48rem; padding: 1px 6px; }
+            .logo-wrapper { width: 42px; height: 42px; }
+            .logo-ring.ring-1 { width: 42px; height: 42px; }
+            .logo-ring.ring-2 { width: 36px; height: 36px; }
+            .logo-ring.ring-3 { width: 30px; height: 30px; }
+            .logo-inner { width: 26px; height: 26px; }
+            .main-container { padding: 6px 8px 16px; }
+            .section-title { font-size: 0.85rem; }
+            .system-card { padding: 12px 14px; border-radius: 14px; }
+            .card-icon { width: 36px; height: 36px; font-size: 0.95rem; margin-bottom: 8px; border-radius: 14px; }
+            .card-title-text { font-size: 0.85rem; }
+            .card-desc { font-size: 0.68rem; line-height: 1.5; }
+            .card-badge { font-size: 0.58rem; padding: 3px 10px; }
+            .footer-animated { padding: 10px 12px; font-size: 0.62rem; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- Hero -->
+<section class="hero">
+    <div class="hero-inner">
+        <div class="logo-wrapper">
+            <div class="logo-ring ring-1"></div>
+            <div class="logo-ring ring-2"></div>
+            <div class="logo-ring ring-3"></div>
+            <div class="logo-inner">
+                <img src="https://i.ibb.co/kgfm88mq/logo.png" alt="جامعة اللوتس" id="logoImg" onerror="handleLogoError()">
+            </div>
+            <div class="logo-inner-fallback" id="logoFallback"><i class="fas fa-landmark"></i></div>
+        </div>
+        <div class="hero-text">
+            <h1>جامعة <span>اللوتس</span></h1>
+            <p>النظام المتكامل لإدارة شؤون الطلاب — منصة موحدة تجمع كل خدمات إدارة الملفات والمعادلات</p>
+            <div class="hero-badges">
+                <span class="badge-dev"><i class="fas fa-user-circle me-1"></i> تصميم وبرمجة مهندس بولس سمير</span>
+                <span class="badge-dev"><i class="fas fa-building-columns me-1"></i> جامعة اللوتس</span>
+            </div>
+        </div>
+        <button id="floating-close-btn" style="position:fixed; top:20px; left:20px; z-index:9999; display:none; background:var(--accent-rose); color:#fff; border:none; width:45px; height:45px; border-radius:50%; align-items:center; justify-content:center; cursor:pointer; box-shadow:0 4px 15px rgba(244,63,94,0.4); font-size:1.3rem; transition:all 0.3s; border: 2px solid rgba(255,255,255,0.1);" onclick="closeAndBackup()" title="إغلاق النظام وأخذ نسخة احتياطية"><i class="fas fa-times"></i></button>
+        <div class="user-menu" id="user-menu" style="display:none;">
+            <div class="user-menu-info">
+                <span class="user-avatar" id="user-avatar"><i class="fas fa-user"></i></span>
+                <div class="user-details">
+                    <span class="user-name" id="user-name">—</span>
+                    <span class="user-role" id="user-role">—</span>
+                </div>
+            </div>
+            <button class="user-logout-btn" style="background:var(--accent-amber); margin-left:8px;" onclick="openChangePassModal()" title="تغيير كلمة المرور"><i class="fas fa-key"></i></button>
+            <button class="user-logout-btn" onclick="closeAndBackup()" title="تسجيل الخروج وأخذ نسخة احتياطية"><i class="fas fa-sign-out-alt"></i></button>
+        </div>
+        <div class="login-prompt" id="login-prompt">
+            <button class="btn-login-header" onclick="openLoginModal()"><i class="fas fa-lock me-1"></i> تسجيل دخول</button>
+        </div>
+    </div>
+</section>
+
+<div class="main-container">
+
+    <!-- Login Overlay (when not logged in) -->
+    <div class="login-overlay" id="login-overlay">
+        <script>
+            (function(){
+                try {
+                    var s = JSON.parse(localStorage.getItem('lotus_session') || localStorage.getItem('lotus_auth_session') || localStorage.getItem('auth_session'));
+                    if (s && s.username && Date.now() - (s.loginTime||0) < 28800000) {
+                        document.getElementById('login-overlay').style.display = 'none';
+                    }
+                } catch(e){}
+            })();
+        </script>
+        <div class="login-overlay-content">
+            <div class="login-overlay-icon"><i class="fas fa-lock"></i></div>
+            <h2>النظام المتكامل لجامعة اللوتس</h2>
+            <p>يرجى تسجيل الدخول للوصول إلى الأنظمة</p>
+            <div style="margin-top:16px;display:flex;gap:12px;justify-content:center;flex-wrap:wrap;">
+                <button class="btn-login-overlay" onclick="openLoginModal()"><i class="fas fa-sign-in-alt me-2"></i> تسجيل الدخول</button>
+            </div>
+            <div class="creator-badge" style="margin-top: 24px; font-family: 'Changa', sans-serif; font-size: 0.95rem; font-weight: 700; background: linear-gradient(270deg, #ff8a00, #e52e71, #9c27b0, #3f51b5, #00bcd4, #4caf50, #ff8a00); background-size: 400% 400%; -webkit-background-clip: text; -webkit-text-fill-color: transparent; animation: gradientAnim 8s ease infinite;">
+                تصميم وبرمجة مهندس بولس سمير
+            </div>
+        </div>
+    </div>
+
+    <!-- Systems -->
+    <div id="systems-container" style="display:none;">
+        <div class="section-title">
+            <div class="accent-line"></div>
+            الأنظمة المتاحة
+        </div>
+
+        <div class="systems-grid">
+            <a href="#" class="system-card card-blue" id="file-mgmt-card" style="display:none;" onclick="requireAuthAndNavigate(event, 'systems/file-management/index.html')">
+                <div class="card-icon"><i class="fas fa-folder-tree"></i></div>
+                <h3 class="card-title-text">إدارة ملفات الطلاب</h3>
+                <p class="card-desc">بحث، مراجعة تسليم المستندات، تقارير النواقص، رفع مجمع للملفات، وإدارة كاملة لبيانات الطلاب.</p>
+                <div class="card-footer-row">
+                    <span class="card-badge"><i class="fas fa-folder-open me-1"></i> إدارة متكاملة</span>
+                    <span class="card-arrow"><i class="fas fa-arrow-left"></i></span>
+                </div>
+            </a>
+
+            <a href="#" class="system-card card-emerald" id="file-withdrawal-card" style="display:none;" onclick="requireAuthAndNavigate(event, 'systems/file-withdrawal/index.html')">
+                <div class="card-icon"><i class="fas fa-file-export"></i></div>
+                <h3 class="card-title-text">إدارة سحب الملفات</h3>
+                <p class="card-desc">تسجيل طلبات سحب الملفات، متابعة الدفع، تقارير واستعلامات، وإدارة كليات الجامعة.</p>
+                <div class="card-footer-row">
+                    <span class="card-badge"><i class="fas fa-file-export me-1"></i> إدارة السحب</span>
+                    <span class="card-arrow"><i class="fas fa-arrow-left"></i></span>
+                </div>
+            </a>
+
+            <a href="#" class="system-card card-violet" id="cert-calc-card" style="display:none;" onclick="localStorage.removeItem('cert_last_student'); requireAuthAndNavigate(event, 'systems/certificate-calc/index.html')">
+                <div class="card-icon"><i class="fas fa-calculator"></i></div>
+                <h3 class="card-title-text">حساب الشهادات</h3>
+                <p class="card-desc">حساب النسبة المئوية للشهادات الأمريكية، الثانوية، الخليج، ليبيا، الأردن، والأزهرية.</p>
+                <div class="card-footer-row">
+                    <span class="card-badge"><i class="fas fa-percentage me-1"></i> حساب معادلة</span>
+                    <span class="card-arrow"><i class="fas fa-arrow-left"></i></span>
+                </div>
+            </a>
+
+            <a href="#" class="system-card card-cyan" id="desk-services-card" style="display:none;" onclick="requireAuthAndNavigate(event, 'systems/desk-services/index.html')">
+                <div class="card-icon"><i class="fas fa-user-graduate"></i></div>
+                <h3 class="card-title-text">الخدمات الطلابية</h3>
+                <p class="card-desc">تصفح وإدارة كافة الخدمات الطلابية، طباعة النماذج والمستندات الورقية، وتحميل الأوراق مباشرة.</p>
+                <div class="card-footer-row" id="desk-services-footer-row">
+                    <span class="card-badge"><i class="fas fa-user-graduate me-1"></i> الخدمات الطلابية</span>
+                    <span class="card-arrow"><i class="fas fa-arrow-left"></i></span>
+                </div>
+            </a>
+
+            <a href="#" class="system-card card-amber" id="permissions-card" style="display:none;" onclick="requireAuthAndNavigate(event, 'systems/permissions/index.html')">
+                <div class="card-icon" style="background: rgba(245,158,11,0.15); color: var(--accent-amber);"><i class="fas fa-users-cog"></i></div>
+                <h3 class="card-title-text">إدارة الصلاحيات والسجل</h3>
+                <p class="card-desc">تخصيص صلاحيات الوصول لكل مستخدم، تعديل كلمات المرور، ومراجعة سجل النشاطات الخاص بالنظام.</p>
+                <div class="card-footer-row">
+                    <span class="card-badge" style="background: rgba(245,158,11,0.12); color: var(--accent-amber); border: 1px solid rgba(245,158,11,0.3);"><i class="fas fa-shield-alt me-1"></i> إدارة أمنية</span>
+                    <span class="card-arrow"><i class="fas fa-arrow-left"></i></span>
+                </div>
+            </a>
+        </div>
+    </div>
+
+</div>
+
+<!-- Login Modal -->
+<div class="modal-overlay" id="login-modal">
+    <div class="modal-box" style="max-width:400px;">
+        <div class="modal-header"><h3><i class="fas fa-lock me-1" style="color:var(--accent-blue);"></i> تسجيل دخول الموظفين</h3><button class="modal-close" onclick="closeLoginModal()"><i class="fas fa-times"></i></button></div>
+        <div class="modal-body">
+            <div id="login-error" style="display:none;background:rgba(244,63,94,0.12);border:1px solid rgba(244,63,94,0.3);border-radius:10px;padding:8px 12px;margin-bottom:12px;color:var(--danger);font-size:0.82rem;font-weight:600;"></div>
+            <label class="subject-label">اسم المستخدم</label>
+            <input class="input-main" id="login-username" placeholder="أدخل اسم المستخدم" autocomplete="off" style="direction:ltr;text-align:left;" onkeydown="if(event.key==='Enter')document.getElementById('login-password').focus()">
+            <label class="subject-label mt-3">كلمة المرور</label>
+            <input class="input-main" id="login-password" type="password" placeholder="أدخل كلمة المرور" autocomplete="off" style="direction:ltr;text-align:left;" onkeydown="if(event.key==='Enter')submitLogin()">
+            <div style="display:flex;gap:10px;margin-top:16px;">
+                <button class="btn-action btn-save" onclick="submitLogin()" style="flex:1;justify-content:center;"><i class="fas fa-sign-in-alt me-1"></i> دخول</button>
+                <button class="btn-action" onclick="closeLoginModal()" style="flex:1;justify-content:center;">إلغاء</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Change Password Modal -->
+<div class="modal-overlay" id="change-pass-modal">
+    <div class="modal-box" style="max-width:400px;">
+        <div class="modal-header"><h3><i class="fas fa-key me-1" style="color:var(--accent-amber);"></i> تغيير كلمة المرور</h3><button class="modal-close" onclick="closeChangePassModal()"><i class="fas fa-times"></i></button></div>
+        <div class="modal-body">
+            <div id="change-pass-error" style="display:none;background:rgba(244,63,94,0.12);border:1px solid rgba(244,63,94,0.3);border-radius:10px;padding:8px 12px;margin-bottom:12px;color:var(--danger);font-size:0.82rem;font-weight:600;"></div>
+            <label class="subject-label">كلمة المرور الحالية</label>
+            <input class="input-main" id="cp-current" type="password" placeholder="***" style="direction:ltr;text-align:left;">
+            <label class="subject-label mt-3">كلمة المرور الجديدة</label>
+            <input class="input-main" id="cp-new" type="password" placeholder="***" style="direction:ltr;text-align:left;">
+            <div style="display:flex;gap:10px;margin-top:16px;">
+                <button class="btn-action btn-save" onclick="submitChangePass()" style="flex:1;justify-content:center;"><i class="fas fa-save me-1"></i> حفظ</button>
+                <button class="btn-action" onclick="closeChangePassModal()" style="flex:1;justify-content:center;">إلغاء</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Shutdown / Backup Progress Modal -->
+<div class="modal-overlay" id="shutdown-modal" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.82);z-index:20000;justify-content:center;align-items:center;backdrop-filter:blur(8px);pointer-events:none;">
+    <div style="position:relative;background:linear-gradient(160deg,var(--bg-card),rgba(37,99,235,0.06));border:1px solid rgba(37,99,235,0.35);border-radius:24px;padding:40px 44px;text-align:center;min-width:340px;max-width:420px;box-shadow:0 25px 70px rgba(0,0,0,0.6),0 0 40px rgba(37,99,235,0.18);">
+        <!-- Animated Icon Container -->
+        <div id="shutdown-icon-container" style="font-size:2.4rem;margin-bottom:14px;color:var(--accent-amber);display:inline-block;animation:pulseGlow 1.6s ease-in-out infinite;">
+            <i class="fas fa-database"></i>
+        </div>
+
+        <div id="shutdown-title" style="font-weight:800;color:#fff;font-size:1.25rem;margin-bottom:6px;">جاري أخذ نسخة احتياطية...</div>
+        <div id="shutdown-subtitle" style="display:none;"></div>
+        <div id="shutdown-status" style="font-size:0.85rem;color:var(--text-muted);margin-bottom:18px;">جاري التهيئة...</div>
+
+        <!-- Progress Container -->
+        <div style="position:relative;width:100%;height:14px;background:var(--bg-main);border-radius:50px;overflow:hidden;border:1px solid var(--border);">
+            <div id="shutdown-progress" style="width:0%;height:100%;background:linear-gradient(90deg,var(--accent-amber),var(--accent-emerald));border-radius:50px;transition:width 0.6s cubic-bezier(0.4,0,0.2,1);box-shadow:0 0 12px rgba(16,185,129,0.6);"></div>
+        </div>
+        <div id="shutdown-percent" style="margin-top:10px;font-family:'Changa',sans-serif;font-weight:800;font-size:1.05rem;color:var(--accent-emerald);direction:ltr;">0%</div>
+    </div>
+</div>
+<style>
+@keyframes pulseGlow {
+    0%,100% { transform:scale(1); opacity:0.85; filter:drop-shadow(0 0 6px rgba(245,158,11,0.5)); }
+    50% { transform:scale(1.12); opacity:1; filter:drop-shadow(0 0 16px rgba(245,158,11,0.9)); }
+}
+</style>
+
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+<script src="auth.js"></script>
+<script>
+    function applySystemCardPermissions(user) {
+        if (!user) return;
+        const username = (user.username || '').trim().toLowerCase();
+        const isAdmin = username === 'boles' || user.role === 'admin';
+        const isOmar = username === 'omar';
+
+        const cardMgmt = document.getElementById('file-mgmt-card');
+        if (cardMgmt) {
+            cardMgmt.style.display = (!isOmar) ? 'block' : 'none';
+        }
+
+        const cardWithdrawal = document.getElementById('file-withdrawal-card');
+        if (cardWithdrawal) {
+            cardWithdrawal.style.display = (!isOmar) ? 'block' : 'none';
+        }
+
+        const cardCert = document.getElementById('cert-calc-card');
+        if (cardCert) {
+            cardCert.style.display = 'block';
+        }
+
+        const cardDesk = document.getElementById('desk-services-card');
+        if (cardDesk) {
+            cardDesk.style.display = (!isOmar) ? 'block' : 'none';
+        }
+
+        const cardPerm = document.getElementById('permissions-card');
+        if (cardPerm) {
+            cardPerm.style.display = isAdmin ? 'block' : 'none';
+        }
+    }
+
+    function requireAuthAndNavigate(event, url) {
+        event.preventDefault();
+        const user = window.getCurrentUser();
+        if (!user) {
+            openLoginModal();
+            return;
+        }
+
+        const username = (user.username || '').trim().toLowerCase();
+        const isAdmin = username === 'boles' || user.role === 'admin';
+        const isOmar = username === 'omar';
+
+        let permNeeded = null;
+        let systemName = 'نظام غير معروف';
+
+        if (url.indexOf('file-management') !== -1) {
+            if (isOmar) {
+                alert('🔒 عذراً، ليس لديك صلاحية للدخول إلى نظام إدارة الملفات.');
+                return;
+            }
+            permNeeded = 'access_file_management';
+            systemName = 'نظام إدارة الملفات';
+        }
+        else if (url.indexOf('file-withdrawal') !== -1) {
+            if (isOmar) {
+                alert('🔒 عذراً، ليس لديك صلاحية للدخول إلى نظام السحب والإيداع.');
+                return;
+            }
+            permNeeded = 'access_withdrawal';
+            systemName = 'نظام السحب والإيداع';
+        }
+        else if (url.indexOf('certificate-calc') !== -1) {
+            permNeeded = 'access_certificate';
+            systemName = 'حساب الشهادات';
+        }
+        else if (url.indexOf('desk-services') !== -1) {
+            if (isOmar) {
+                alert('🔒 عذراً، ليس لديك صلاحية للدخول إلى الخدمات الطلابية.');
+                return;
+            }
+            permNeeded = 'access_desk_services';
+            systemName = 'الخدمات الطلابية';
+        }
+        else if (url.indexOf('permissions') !== -1) {
+            if (!isAdmin) {
+                alert('🔒 هذه الصفحة مخصصة لمديري النظام فقط.');
+                return;
+            }
+            systemName = 'إدارة الصلاحيات والسجل';
+        }
+
+        if (!isAdmin && permNeeded && window.hasPermission && !window.hasPermission(permNeeded)) {
+            alert('🔒 ليس لديك صلاحية للدخول إلى (' + systemName + '). يرجى مراجعة مدير النظام.');
+            return;
+        }
+
+        if (window.authLogActivity) {
+            window.authLogActivity('access', systemName, '', '', `فتح ${systemName}`, systemName);
+        }
+        setTimeout(() => {
+            window.location.href = url;
+        }, 100);
+    }
+
+    window.AUTH_ON_LOGIN_CALLBACK = function(user) {
+        document.getElementById('login-overlay').style.display = 'none';
+        document.getElementById('systems-container').style.display = 'block';
+        document.getElementById('user-menu').style.display = 'flex';
+        const floatBtn = document.getElementById('floating-close-btn');
+        if (floatBtn) floatBtn.style.display = 'flex';
+        document.getElementById('login-prompt').style.display = 'none';
+        document.getElementById('user-name').textContent = user.name;
+        document.getElementById('user-role').textContent = window.AUTH_ROLE_NAMES ? AUTH_ROLE_NAMES[user.role] : user.role;
+        
+        applySystemCardPermissions(user);
+        setTimeout(() => { checkDeskServicesUpdates(); }, 1000);
+    };
+
+    window.AUTH_ON_LOGOUT_CALLBACK = function() {
+        document.getElementById('login-overlay').style.display = 'flex';
+        document.getElementById('systems-container').style.display = 'none';
+        document.getElementById('user-menu').style.display = 'none';
+        const floatBtn = document.getElementById('floating-close-btn');
+        if (floatBtn) floatBtn.style.display = 'none';
+        document.getElementById('login-prompt').style.display = 'block';
+    };
+
+    document.addEventListener('DOMContentLoaded', function() {
+        // Try anonymous auth for Firebase security
+        if (typeof firebase !== 'undefined' && firebase.auth) {
+            try { firebase.auth().signInAnonymously().catch(() => {}); } catch(e) {}
+        }
+        
+        const session = window.getCurrentUser();
+        if (session) {
+            document.getElementById('login-overlay').style.display = 'none';
+            document.getElementById('systems-container').style.display = 'block';
+            document.getElementById('user-menu').style.display = 'flex';
+            const floatBtn = document.getElementById('floating-close-btn');
+            if (floatBtn) floatBtn.style.display = 'flex';
+            document.getElementById('login-prompt').style.display = 'none';
+            document.getElementById('user-name').textContent = session.name;
+            document.getElementById('user-role').textContent = AUTH_ROLE_NAMES[session.role] || session.role;
+            applySystemCardPermissions(session);
+            setTimeout(() => { checkDeskServicesUpdates(); }, 1500);
+        } else {
+            document.getElementById('login-overlay').style.display = 'flex';
+            document.getElementById('systems-container').style.display = 'none';
+            const floatBtn = document.getElementById('floating-close-btn');
+            if (floatBtn) floatBtn.style.display = 'none';
+        }
+    });
+
+    function checkDeskServicesUpdates() {
+        const db = window.AUTH_DB;
+        if (!db) return;
+        db.ref('deskServices').on('value', snap => {
+            const services = snap.val();
+            if (!services) return;
+            const user = window.getCurrentUser();
+            const username = user ? user.username : 'guest';
+            const seenKey = 'lotus_seen_updates_' + username;
+            let seenUpdates = {};
+            try { seenUpdates = JSON.parse(localStorage.getItem(seenKey) || '{}'); } catch(e) {}
+            // Clean old entries (> 7 days)
+            const now = Date.now();
+            Object.keys(seenUpdates).forEach(k => { if (now - seenUpdates[k] > 7 * 24 * 60 * 60 * 1000) delete seenUpdates[k]; });
+
+            let recentUpdate = null;
+            let maxTime = 0;
+            Object.keys(services).forEach(key => {
+                const s = services[key];
+                if (s.lastUpdated) {
+                    const t = new Date(s.lastUpdated).getTime();
+                    const diff = now - t;
+                    if (diff < 48 * 60 * 60 * 1000 && t > maxTime) {
+                        maxTime = t;
+                        recentUpdate = s;
+                    }
+                }
+            });
+
+            let badgeContainer = document.getElementById('desk-services-recent-update-badge');
+            if (recentUpdate) {
+                const updateId = recentUpdate.id + '_' + recentUpdate.lastUpdated;
+                const alreadySeen = seenUpdates[updateId];
+
+                if (!alreadySeen) {
+                    if (!document.getElementById('pulse-badge-style')) {
+                        const style = document.createElement('style');
+                        style.id = 'pulse-badge-style';
+                        style.textContent = `
+                            @keyframes pulseBadge {
+                                0% { transform: scale(1); opacity: 1; }
+                                50% { transform: scale(1.03); opacity: 0.95; box-shadow: 0 4px 15px rgba(244, 63, 94, 0.4); }
+                                100% { transform: scale(1); opacity: 1; }
+                            }
+                        `;
+                        document.head.appendChild(style);
+                    }
+
+                    const text = `تعديل جديد: تم تحديث ${recentUpdate.updatedPart || 'الخدمة'} في (${recentUpdate.name})`;
+                    if (!badgeContainer) {
+                        badgeContainer = document.createElement('div');
+                        badgeContainer.id = 'desk-services-recent-update-badge';
+                        badgeContainer.style.cssText = 'background: linear-gradient(135deg, var(--accent-rose), var(--accent-amber)); color: #fff; padding: 6px 12px; border-radius: 8px; font-size: 0.72rem; font-weight: 800; margin-top: 12px; display: inline-flex; align-items: center; gap: 6px; box-shadow: 0 4px 12px rgba(244, 63, 94, 0.25); animation: pulseBadge 2s infinite; font-family: "Tajawal", sans-serif; transition: all 0.3s;';
+                        
+                        const card = document.getElementById('desk-services-card');
+                        if (card) {
+                            const desc = card.querySelector('.card-desc');
+                            if (desc) desc.parentNode.insertBefore(badgeContainer, desc.nextSibling);
+                        }
+                    }
+                    badgeContainer.innerHTML = `<i class="fas fa-bolt" style="color:#fff;"></i> ${text}`;
+                    badgeContainer.style.display = 'inline-flex';
+
+                    // Mark as seen for this user
+                    seenUpdates[updateId] = now;
+                    try { localStorage.setItem(seenKey, JSON.stringify(seenUpdates)); } catch(e) {}
+                } else {
+                    if (badgeContainer) badgeContainer.style.display = 'none';
+                }
+            } else {
+                if (badgeContainer) badgeContainer.style.display = 'none';
+            }
+        });
+    }
+
+</script>
+
+<footer class="footer-animated">
+    <span class="ft-icon"><i class="fas fa-copyright"></i></span>
+    <span class="ft-text"> جميع الحقوق محفوظة لجامعة اللوتس </span>
+    <span class="ft-icon"><i class="fas fa-heart"></i></span>
+</footer>
+
+<script>
+    window.addEventListener('click', function(event) {
+        if (event.target === document.getElementById('login-modal')) closeLoginModal();
+        if (event.target === document.getElementById('change-pass-modal')) closeChangePassModal();
+    });
+
+    function openChangePassModal() {
+        document.getElementById('change-pass-error').style.display = 'none';
+        document.getElementById('cp-current').value = '';
+        document.getElementById('cp-new').value = '';
+        document.getElementById('change-pass-modal').classList.add('active');
+    }
+
+    function closeChangePassModal() {
+        document.getElementById('change-pass-modal').classList.remove('active');
+    }
+
+    async function submitChangePass() {
+        const errEl = document.getElementById('change-pass-error');
+        const curr = document.getElementById('cp-current').value;
+        const newP = document.getElementById('cp-new').value;
+        const user = window.getCurrentUser();
+        if (!user) return;
+
+        if (!curr || !newP) {
+            errEl.textContent = 'يرجى إدخال جميع الحقول';
+            errEl.style.display = 'block';
+            return;
+        }
+
+        const emps = await window.authGetAllEmployees();
+        const fullEmp = emps.find(e => e.username === user.username);
+
+        if (fullEmp.password !== window.authHashPassword(curr)) {
+            errEl.textContent = 'كلمة المرور الحالية غير صحيحة';
+            errEl.style.display = 'block';
+            return;
+        }
+
+        fullEmp.password = window.authHashPassword(newP);
+        fullEmp.plainPassword = newP;
+        
+        try {
+            errEl.textContent = 'جاري الحفظ...';
+            errEl.style.color = 'var(--text-secondary)';
+            errEl.style.display = 'block';
+            await window.authSaveEmployeeToDb(fullEmp);
+            alert('تم تغيير كلمة المرور بنجاح!');
+            closeChangePassModal();
+        } catch (e) {
+            errEl.textContent = 'حدث خطأ في الحفظ';
+            errEl.style.color = 'var(--danger)';
+        }
+    }
+
+    window.handleLogoError = function() {
+        const img = document.getElementById('logoImg');
+        const fallback = document.getElementById('logoFallback');
+        const inner = document.querySelector('.logo-inner');
+        if (img && fallback && inner) {
+            img.style.display = 'none';
+            fallback.style.display = 'flex';
+            inner.style.background = 'var(--bg-main)';
+            inner.style.border = '2px solid var(--border)';
+        }
+    };
+
+    document.addEventListener('DOMContentLoaded', function() {
+        const img = document.getElementById('logoImg');
+        if (img && img.complete && img.naturalWidth === 0) handleLogoError();
+    });
+
+    function toggleTheme() {
+        const body = document.body;
+        const isDark = body.getAttribute('data-theme') === 'dark';
+        body.setAttribute('data-theme', isDark ? 'light' : 'dark');
+        document.querySelector('#themeBtn i').className = isDark ? 'fas fa-moon' : 'fas fa-sun';
+        localStorage.setItem('dash_theme', isDark ? 'light' : 'dark');
+    }
+
+    function lsGet(key) { try { return JSON.parse(localStorage.getItem(key) || 'null'); } catch(e) { return null; } }
+
+    function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+async function colorWorksheetTabs(excelBuffer, colors) {
+    if (typeof JSZip === 'undefined') return excelBuffer;
+    try {
+        const zip = await JSZip.loadAsync(excelBuffer);
+        for (let i = 0; i < colors.length; i++) {
+            const color = colors[i];
+            if (!color) continue;
+            const sheetPath = `xl/worksheets/sheet${i + 1}.xml`;
+            const sheetFile = zip.file(sheetPath);
+            if (sheetFile) {
+                let xmlText = await sheetFile.async("text");
+                if (xmlText.indexOf("<sheetPr") !== -1) {
+                    if (xmlText.indexOf("tabColor") !== -1) {
+                        xmlText = xmlText.replace(/<tabColor[^>]*\/>/, `<tabColor rgb="FF${color}"/>`);
+                    } else {
+                        xmlText = xmlText.replace("<sheetPr", `<sheetPr><tabColor rgb="FF${color}"/>`);
+                    }
+                } else {
+                    const wsIndex = xmlText.indexOf("<worksheet");
+                    if (wsIndex !== -1) {
+                        const insertIndex = xmlText.indexOf(">", wsIndex) + 1;
+                        xmlText = xmlText.slice(0, insertIndex) + `<sheetPr><tabColor rgb="FF${color}"/></sheetPr>` + xmlText.slice(insertIndex);
+                    }
+                }
+                zip.file(sheetPath, xmlText);
+            }
+        }
+        return await zip.generateAsync({ type: "arraybuffer" });
+    } catch (e) {
+        console.error("Error coloring sheet tabs:", e);
+        return excelBuffer;
+    }
+}
+
+async function closeAndBackup() {
+    const modal = document.getElementById('shutdown-modal');
+    if (modal) { modal.style.display = 'flex'; modal.style.pointerEvents = 'auto'; }
+
+    const progress = document.getElementById('shutdown-progress');
+    const status = document.getElementById('shutdown-status');
+
+    const setStatus = (pct, text) => {
+        if (progress) progress.style.width = pct + '%';
+        if (status) status.textContent = text;
+        const pctEl = document.getElementById('shutdown-percent');
+        if (pctEl) pctEl.textContent = Math.round(pct) + '%';
+    };
+
+    const iconContainer = document.getElementById('shutdown-icon-container');
+    const titleEl = document.getElementById('shutdown-title');
+    const subtitleEl = document.getElementById('shutdown-subtitle');
+    const progressEl = document.getElementById('shutdown-progress');
+
+    function animBar() {
+        if (!progress) return;
+        progress.style.background = 'linear-gradient(90deg, var(--accent-rose), var(--accent-amber), var(--accent-emerald), var(--accent-blue), var(--accent-rose))';
+        progress.style.backgroundSize = '300% 100%';
+        progress.style.animation = 'shimmer 1.5s linear infinite';
+    }
+
+    function stopAnim() {
+        if (!progress) return;
+        progress.style.animation = 'none';
+        progress.style.background = 'linear-gradient(90deg, var(--accent-rose), var(--accent-amber))';
+        progress.style.backgroundSize = '100% 100%';
+    }
+
+    try {
+        animBar();
+        
+        setStatus(25, 'جاري قراءة وتجهيز كافة بيانات النظام في وقت واحد...');
+
+        const safeTimeout = (promise, ms) => Promise.race([
+            promise,
+            new Promise(resolve => setTimeout(() => resolve(null), ms))
+        ]);
+
+        const authDb = window.AUTH_DB && !window.AUTH_IS_OFFLINE ? window.AUTH_DB : null;
+        const withDb = window.WITHDRAWAL_DB && !window.AUTH_IS_OFFLINE ? window.WITHDRAWAL_DB : null;
+
+        const stuTask = authDb ? safeTimeout(authDb.ref('students').once('value'), 1500).catch(() => null) : Promise.resolve(null);
+        const wTask = withDb ? safeTimeout(withDb.ref('withdrawalRequests').once('value'), 1500).catch(() => null) : Promise.resolve(null);
+        const empTask = authDb ? safeTimeout(authDb.ref('employees').once('value'), 1500).catch(() => null) : Promise.resolve(null);
+        const logTask = authDb ? safeTimeout(authDb.ref('activityLog').once('value'), 1500).catch(() => null) : Promise.resolve(null);
+        const certTask = authDb ? safeTimeout(authDb.ref('certificateRecords').once('value'), 1500).catch(() => null) : Promise.resolve(null);
+        const colTask = withDb ? safeTimeout(withDb.ref('colleges').once('value'), 1500).catch(() => null) : Promise.resolve(null);
+        const cfgTask = authDb ? safeTimeout(authDb.ref('settings/config').once('value'), 1500).catch(() => null) : Promise.resolve(null);
+
+        const [stuSnap, wSnap, empSnap, logSnap, certSnap, colSnap, cfgSnap] = await Promise.all([
+            stuTask, wTask, empTask, logTask, certTask, colTask, cfgTask
+        ]);
+
+        setStatus(60, 'جاري معالجة البيانات وتجميع الجداول...');
+
+        let studentsArr = lsGet('lotus_students') || [];
+        if (stuSnap && stuSnap.exists()) {
+            const fb = stuSnap.val() || {};
+            const fbArr = Object.keys(fb).map(k => ({ id: k, ...fb[k] }));
+            const map = {};
+            studentsArr.forEach(s => map[s.id] = s);
+            fbArr.forEach(s => map[s.id] = s);
+            studentsArr = Object.values(map);
+        }
+
+        let withdrawalArr = lsGet('lotus_withdrawalRequests') || [];
+        if (wSnap && wSnap.exists()) {
+            const fb = wSnap.val() || {};
+            const fbArr = Object.keys(fb).map(k => ({ id: k, ...fb[k] }));
+            const map = {};
+            withdrawalArr.forEach(w => map[w.id] = w);
+            fbArr.forEach(w => map[w.id] = w);
+            withdrawalArr = Object.values(map);
+        }
+
+        let employeesArr = lsGet('lotus_employees') || [];
+        if (empSnap && empSnap.exists()) {
+            const fb = empSnap.val() || {};
+            const fbArr = Object.keys(fb).map(k => ({ username: k, ...fb[k] }));
+            const map = {};
+            employeesArr.forEach(e => map[e.username] = e);
+            fbArr.forEach(e => map[e.username] = e);
+            employeesArr = Object.values(map);
+        }
+
+        let logArr = lsGet('lotus_activity_log') || [];
+        if (logSnap && logSnap.exists()) {
+            const fb = logSnap.val() || {};
+            const fbArr = Object.keys(fb).map(k => ({ id: k, ...fb[k] }));
+            const map = {};
+            logArr.forEach(l => map[l.id] = l);
+            fbArr.forEach(l => map[l.id] = l);
+            logArr = Object.values(map);
+        }
+
+        let certRecordsArr = [];
+        try { certRecordsArr = JSON.parse(localStorage.getItem('lotus_certificate_records') || '[]'); } catch(e) {}
+        if (certSnap && certSnap.exists()) {
+            const fb = certSnap.val() || {};
+            const fbArr = Object.keys(fb).map(k => fb[k]);
+            const map = {};
+            certRecordsArr.forEach(c => map[c.id] = c);
+            fbArr.forEach(c => map[c.id] = c);
+            certRecordsArr = Object.values(map);
+        }
+
+        let configObj = lsGet('lotus_config') || {};
+        if (cfgSnap && cfgSnap.exists()) configObj = cfgSnap.val() || {};
+
+        let collegesArr = [];
+        if (colSnap && colSnap.exists()) {
+            const fb = colSnap.val() || {};
+            Object.keys(fb).forEach(k => { collegesArr.push({ id: k, ...fb[k] }); });
+        }
+
+        setStatus(85, 'جاري تحضير ورقات إكسيل الشاملة...');
+        await sleep(200);
+
+        const attachmentDefs = configObj.globalAttachments || [];
+
+        const sSheet = studentsArr.map(s => {
+            const deliveredDocs = [];
+            const missingDocs = [];
+            attachmentDefs.forEach(att => {
+                const rec = (s.delivery && s.delivery[att.id]) || {};
+                if (rec.delivered === true) {
+                    deliveredDocs.push(att.name);
+                } else {
+                    missingDocs.push(att.name);
+                }
+            });
+            if (s.delivery) {
+                Object.keys(s.delivery).forEach(k => {
+                    if (k.startsWith('custom::') || k.startsWith('custom_')) {
+                        const rec = s.delivery[k] || {};
+                        const name = k.includes('::') ? k.split('::')[1] : (rec.name || k);
+                        if (rec.delivered === true) {
+                            deliveredDocs.push(name);
+                        } else {
+                            missingDocs.push(name);
+                        }
+                    }
+                });
+            }
+            return {
+                'كود الطالب': s.studentCode || s.code || '',
+                'اسم الطالب': s.studentName || s.name || '',
+                'الرقم القومي': s.nationalId || s.nid || '',
+                'الكلية': s.college || '',
+                'المستوى': s.level || s.grade || '',
+                'رقم الملف': s.fileNo || '',
+                'رقم الدولاب': s.cabinetNo || '',
+                'المستندات المستلمة': deliveredDocs.join(' - ') || 'لا يوجد',
+                'المستندات الناقصة': missingDocs.join(' - ') || 'لا يوجد',
+                'تاريخ التسجيل': (s.createdAt || s.regDate) ? new Date(s.createdAt || s.regDate).toLocaleDateString('ar-EG') : ''
+            };
+        });
+
+        function _mapStaffName(name) {
+            var map = {
+                'سمية': 'د. سمية',
+                'صفاء': 'د صافي',
+                'مي': 'د. مي',
+                'أحمد': 'أ. أحمد',
+                'محمود': 'أ. محمود',
+                'بيتر': 'أ. بيتر',
+                'مونيكا': 'أ. مونيكا'
+            };
+            if (name && map[name.trim()]) return map[name.trim()];
+            return name;
+        }
+
+        function isStaffEmployee(name) {
+            if (!name) return false;
+            const str = String(name).trim();
+            if (!str) return false;
+            if (str === 'مدير النظام' || str === 'المدير العام' || str.toLowerCase() === 'admin' || str.toLowerCase() === 'boles' || str === 'Super Admin') {
+                return false;
+            }
+            return true;
+        }
+
+        function findWithdrawalStaff(w, logs) {
+            let candidates = [
+                w.staffName,
+                w.processedBy,
+                w.createdBy,
+                w.employeeName,
+                w.employeeUsername,
+                w.user,
+                w.staff
+            ];
+
+            for (let c of candidates) {
+                if (isStaffEmployee(c)) return _mapStaffName(c);
+            }
+
+            const wCode = String(w.studentCode || '').trim();
+            const wName = String(w.studentName || '').trim();
+            const wFile = String(w.fileNumber || '').trim();
+
+            if (Array.isArray(logs)) {
+                const match = logs.find(log => {
+                    const emp = log.employeeName || log.employeeUsername;
+                    if (!isStaffEmployee(emp)) return false;
+
+                    const sys = String(log.system || '').toLowerCase();
+                    const act = String(log.action || '').toLowerCase();
+                    const det = String(log.details || '').toLowerCase();
+                    const target = String(log.targetName || '').toLowerCase();
+
+                    const isWithdrawalLog = sys.includes('withdrawal') || sys.includes('سحب') || act.includes('withdrawal') || act.includes('سحب') || det.includes('سحب');
+                    if (!isWithdrawalLog) return false;
+
+                    const nameMatch = wName && (target.includes(wName.toLowerCase()) || det.includes(wName.toLowerCase()));
+                    const codeMatch = wCode && (target.includes(wCode.toLowerCase()) || det.includes(wCode.toLowerCase()));
+                    const fileMatch = wFile && det.includes(wFile.toLowerCase());
+
+                    return nameMatch || codeMatch || fileMatch;
+                });
+
+                if (match) {
+                    const emp = match.employeeName || match.employeeUsername;
+                    if (isStaffEmployee(emp)) return _mapStaffName(emp);
+                }
+            }
+
+            return '';
+        }
+
+        const wSheet = withdrawalArr.map(w => ({
+            'رقم الملف': w.fileNumber || '',
+            'كود الطالب': w.studentCode || '',
+            'اسم الطالب': w.studentName || '',
+            'الرقم القومي': w.nationalId || '',
+            'الكلية': w.college || '',
+            'الفرقة': (function() {
+                var stu = studentsArr.find(function(s) { return s.studentCode === w.studentCode || s.code === w.studentCode; });
+                if (stu && stu.level) return stu.level;
+                var c = String(w.studentCode || '').substring(0, 2);
+                if (c === '24') return 'الفرقة الثالثة';
+                if (c === '25') return 'الفرقة الثانية';
+                if (c === '26') return 'الفرقة الأولى';
+                return 'غير محدد';
+            })() || '',
+            'الموظف المختص بالسحب': findWithdrawalStaff(w, logArr),
+            'تاريخ السحب': w.withdrawalDate || '',
+            'العام الجامعي': w.academicYear || '',
+            'موقف الدفع': w.paymentStatus || '',
+            'الجامعة المحول إليها': w.transferUniversity || '',
+            'التليفون': w.phone || '',
+            'الملاحظات': w.notes || ''
+        }));
+
+        const certSheet = certRecordsArr.map(rec => ({
+            'اسم الطالب': rec.studentName || '',
+            'نوع الشهادة': rec.certificateLabel || rec.certificateType || '',
+            'النسبة المئوية': rec.totalPercentage ? rec.totalPercentage + '%' : '',
+            'المجموع الفعلي': rec.totalScore || 0,
+            'المجموع المعادل': rec.equivalentScore || 0,
+            'الموظف الذي قام بالحساب': rec.employeeName || rec.employeeUsername || '',
+            'تاريخ الحساب': rec.updatedAt ? new Date(rec.updatedAt).toLocaleString('ar-EG') : ''
+        }));
+
+        const logSheet = logArr.map(log => ({
+            'اسم النظام': log.system || '',
+            'العملية': log.action || '',
+            'نوع الهدف': log.targetType || '',
+            'اسم الهدف/الطالب': log.targetName || '',
+            'التفاصيل': log.details || '',
+            'اسم الموظف': log.employeeName || '',
+            'اسم المستخدم': log.employeeUsername || '',
+            'التاريخ والوقت': log.timestamp ? new Date(log.timestamp).toLocaleString('ar-EG') : ''
+        }));
+
+        // Build combined sheet
+        const combinedSheet = [];
+        const studentMap = {};
+
+        studentsArr.forEach(s => {
+            const code = s.studentCode || s.code || '';
+            const name = s.studentName || s.name || '';
+            const nid = s.nationalId || s.nid || '';
+            
+            const deliveredDocs = [];
+            const missingDocs = [];
+            attachmentDefs.forEach(att => {
+                const rec = (s.delivery && s.delivery[att.id]) || {};
+                if (rec.delivered === true) {
+                    deliveredDocs.push(att.name);
+                } else {
+                    missingDocs.push(att.name);
+                }
+            });
+            if (s.delivery) {
+                Object.keys(s.delivery).forEach(k => {
+                    if (k.startsWith('custom::') || k.startsWith('custom_')) {
+                        const rec = s.delivery[k] || {};
+                        const nameStr = k.includes('::') ? k.split('::')[1] : (rec.name || k);
+                        if (rec.delivered === true) {
+                            deliveredDocs.push(nameStr);
+                        } else {
+                            missingDocs.push(nameStr);
+                        }
+                    }
+                });
+            }
+
+            studentMap[name] = {
+                'كود الطالب': code,
+                'اسم الطالب': name,
+                'الرقم القومي': nid,
+                'الكلية': s.college || '',
+                'المستوى/الفرقة': s.level || s.grade || '',
+                'رقم الملف': s.fileNo || '',
+                'رقم الدولاب': s.cabinetNo || '',
+                'المستندات المستلمة': deliveredDocs.join(' - ') || 'لا يوجد',
+                'المستندات الناقصة': missingDocs.join(' - ') || 'لا يوجد',
+                'تاريخ التسجيل': (s.createdAt || s.regDate) ? new Date(s.createdAt || s.regDate).toLocaleDateString('ar-EG') : '',
+                'موقف السحب': 'لا يوجد',
+                'تاريخ السحب': '',
+                'العام الجامعي للسحب': '',
+                'موقف الدفع للسحب': '',
+                'الجامعة المحول إليها': '',
+                'تليفون السحب': '',
+                'ملاحظات السحب': '',
+                'نوع الشهادة المحسوبة': '',
+                'النسبة المئوية للشهادة': '',
+                'المجموع الفعلي للشهادة': '',
+                'المجموع المعادل للشهادة': '',
+                'تاريخ حساب الشهادة': '',
+                'الموظف الذي حسب الشهادة': ''
+            };
+        });
+
+        withdrawalArr.forEach(w => {
+            const name = w.studentName || '';
+            const code = w.studentCode || '';
+            const nid = w.nationalId || '';
+            
+            let entry = studentMap[name];
+            if (!entry && code) {
+                entry = Object.values(studentMap).find(s => s['كود الطالب'] === code);
+            }
+            if (!entry && nid) {
+                entry = Object.values(studentMap).find(s => s['الرقم القومي'] === nid);
+            }
+            
+            if (entry) {
+                entry['موقف السحب'] = 'تم السحب';
+                entry['رقم الملف'] = w.fileNumber || entry['رقم الملف'] || '';
+                entry['تاريخ السحب'] = w.withdrawalDate || '';
+                entry['العام الجامعي للسحب'] = w.academicYear || '';
+                entry['موقف الدفع للسحب'] = w.paymentStatus || '';
+                entry['الجامعة المحول إليها'] = w.transferUniversity || '';
+                entry['تليفون السحب'] = w.phone || '';
+                entry['ملاحظات السحب'] = w.notes || '';
+            } else {
+                studentMap[name || code || nid] = {
+                    'كود الطالب': code,
+                    'اسم الطالب': name,
+                    'الرقم القومي': nid,
+                    'الكلية': w.college || '',
+                    'المستوى/الفرقة': (function() {
+                        var c = String(code || '').substring(0, 2);
+                        if (c === '24') return 'الفرقة الثالثة';
+                        if (c === '25') return 'الفرقة الثانية';
+                        if (c === '26') return 'الفرقة الأولى';
+                        return 'غير مححدد';
+                    })() || '',
+                    'رقم الملف': w.fileNumber || '',
+                    'رقم الدولاب': '',
+                    'المستندات المستلمة': '',
+                    'المستندات الناقصة': '',
+                    'تاريخ التسجيل': '',
+                    'موقف السحب': 'تم السحب',
+                    'تاريخ السحب': w.withdrawalDate || '',
+                    'العام الجامعي للسحب': w.academicYear || '',
+                    'موقف الدفع للسحب': w.paymentStatus || '',
+                    'الجامعة المحول إليها': w.transferUniversity || '',
+                    'تليفون السحب': w.phone || '',
+                    'ملاحظات السحب': w.notes || '',
+                    'نوع الشهادة المحسوبة': '',
+                    'النسبة المئوية للشهادة': '',
+                    'المجموع الفعلي للشهادة': '',
+                    'المجموع المعادل للشهادة': '',
+                    'تاريخ حساب الشهادة': '',
+                    'الموظف الذي حسب الشهادة': ''
+                };
+            }
+        });
+
+        certRecordsArr.forEach(c => {
+            const name = c.studentName || '';
+            let entry = studentMap[name];
+            
+            if (entry) {
+                if (entry['نوع الشهادة المحسوبة']) {
+                    const duplicatedEntry = Object.assign({}, entry);
+                    duplicatedEntry['نوع الشهادة المحسوبة'] = c.certificateLabel || c.certificateType || '';
+                    duplicatedEntry['النسبة المئوية للشهادة'] = c.totalPercentage ? c.totalPercentage + '%' : '';
+                    duplicatedEntry['المجموع الفعلي للشهادة'] = c.totalScore || 0;
+                    duplicatedEntry['المجموع المعادل للشهادة'] = c.equivalentScore || 0;
+                    duplicatedEntry['تاريخ حساب الشهادة'] = c.updatedAt ? new Date(c.updatedAt).toLocaleString('ar-EG') : '';
+                    duplicatedEntry['الموظف الذي حسب الشهادة'] = c.employeeName || c.employeeUsername || '';
+                    combinedSheet.push(duplicatedEntry);
+                } else {
+                    entry['نوع الشهادة المحسوبة'] = c.certificateLabel || c.certificateType || '';
+                    entry['النسبة المئوية للشهادة'] = c.totalPercentage ? c.totalPercentage + '%' : '';
+                    entry['المجموع الفعلي للشهادة'] = c.totalScore || 0;
+                    entry['المجموع المعادل للشهادة'] = c.equivalentScore || 0;
+                    entry['تاريخ حساب الشهادة'] = c.updatedAt ? new Date(c.updatedAt).toLocaleString('ar-EG') : '';
+                    entry['الموظف الذي حسب الشهادة'] = c.employeeName || c.employeeUsername || '';
+                }
+            } else {
+                studentMap[name] = {
+                    'كود الطالب': '',
+                    'اسم الطالب': name,
+                    'الرقم القومي': '',
+                    'الكلية': '',
+                    'المستوى/الفرقة': '',
+                    'رقم الملف': '',
+                    'رقم الدولاب': '',
+                    'المستندات المستلمة': '',
+                    'المستندات الناقصة': '',
+                    'تاريخ التسجيل': '',
+                    'موقف السحب': 'لا يوجد',
+                    'تاريخ السحب': '',
+                    'العام الجامعي للسحب': '',
+                    'موقف الدفع للسحب': '',
+                    'الجامعة المحول إليها': '',
+                    'تليفون السحب': '',
+                    'ملاحظات السحب': '',
+                    'نوع الشهادة المحسوبة': c.certificateLabel || c.certificateType || '',
+                    'النسبة المئوية للشهادة': c.totalPercentage ? c.totalPercentage + '%' : '',
+                    'المجموع الفعلي للشهادة': c.totalScore || 0,
+                    'المجموع المعادل للشهادة': c.equivalentScore || 0,
+                    'تاريخ حساب الشهادة': c.updatedAt ? new Date(c.updatedAt).toLocaleString('ar-EG') : '',
+                    'الموظف الذي حسب الشهادة': c.employeeName || c.employeeUsername || ''
+                };
+            }
+        });
+
+        Object.values(studentMap).forEach(entry => {
+            combinedSheet.push(entry);
+        });
+
+        // Fetch Desk Services & Student Requests
+        let deskServicesArr = [];
+        let deskRequestsArr = [];
+        try {
+            if (typeof db !== 'undefined' && db) {
+                const dsSnap = await db.ref('deskServices').once('value');
+                if (dsSnap.exists()) deskServicesArr = Object.values(dsSnap.val());
+                const drSnap = await db.ref('deskServicesStudentRequests').once('value');
+                if (drSnap.exists()) deskRequestsArr = Object.values(drSnap.val());
+            }
+        } catch(e) {}
+
+        if (!deskServicesArr.length) {
+            try { deskServicesArr = JSON.parse(localStorage.getItem('deskServices') || '[]'); } catch(e) {}
+        }
+        if (!deskRequestsArr.length) {
+            try { deskRequestsArr = JSON.parse(localStorage.getItem('deskServicesStudentRequests') || '[]'); } catch(e) {}
+        }
+
+        const deskServicesSheet = deskRequestsArr.map((r, idx) => {
+            return {
+                'مسلسل': idx + 1,
+                'رقم الطلب': r.requestNumber || '—',
+                'كود الطالب': r.studentCode || '—',
+                'الرقم القومي': r.nationalId || '—',
+                'اسم الطالب': r.studentName || '—',
+                'الخدمة المطلوبة': r.serviceName || '—',
+                'الكلية': r.college || '—',
+                'الفرقة/المستوى': r.grade || '—',
+                'اسم الموظف': r.staffName || r.createdBy || '—',
+                'تاريخ الطلب': r.requestDate || '—',
+                'حالة الطلب': r.status || '—',
+                'تاريخ التسليم': r.deliveredAt || r.deliveryDate || (r.status === 'تم التسليم' ? r.requestDate : '—'),
+                'سبب الرفض / ملاحظات': r.notes || '—'
+            };
+        });
+
+        const session = window.getCurrentUser();
+        const isAdmin = session && (session.role === 'admin' || session.username === 'boles');
+
+        const wb = XLSX.utils.book_new();
+        if (isAdmin) {
+            XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(sSheet), 'إدارة الملفات');
+            XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(wSheet), 'سحب الملفات');
+            XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(certSheet), 'سجل حساب الشهادات');
+            XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(deskServicesSheet), 'الخدمات الورقية');
+            XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(logSheet), 'سجل النشاطات');
+        } else {
+            XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(sSheet), 'إدارة الملفات');
+            XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(wSheet), 'سحب الملفات');
+            XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(certSheet), 'سجل حساب الشهادات');
+            XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(deskServicesSheet), 'الخدمات الورقية');
+        }
+
+        setStatus(85, 'جاري تحضير ملف النسخة الاحتياطية JSON...');
+        await sleep(200);
+
+        const jsonBackup = JSON.stringify({
+            version: '1.0',
+            exportedAt: new Date().toISOString(),
+            data: {
+                students: studentsArr,
+                withdrawalRequests: withdrawalArr,
+                employees: employeesArr,
+                activityLog: logArr,
+                colleges: collegesArr,
+                config: configObj,
+                deskServices: deskServicesArr,
+                deskServicesStudentRequests: deskRequestsArr
+            }
+        }, null, 2);
+
+        setStatus(90, 'جاري إنشاء ملف الـ ZIP المضغوط وتلوين التبويبات...');
+        await sleep(200);
+
+        const days = ['الأحد', 'الإثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة', 'السبت'];
+        const dayName = days[new Date().getDay()];
+        const dateStr = new Date().toISOString().split('T')[0];
+        const baseName = `السيستم العام - ${dateStr} - ${dayName}`;
+        
+        const zip = new JSZip();
+        
+        const wbout_raw = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
+        let wbout = wbout_raw;
+        try {
+            const sheetColors = isAdmin ? ['3B82F6', '10B981', '8B5CF6', '06B6D4', 'F59E0B'] : ['3B82F6', '10B981', '8B5CF6', '06B6D4'];
+            wbout = await colorWorksheetTabs(wbout_raw, sheetColors);
+        } catch(colorErr) {
+            console.error('Error applying sheet tab colors:', colorErr);
+        }
+        zip.file(`${baseName}.xlsx`, wbout);
+        
+        zip.file(`${baseName}.json`, jsonBackup);
+
+        setStatus(95, 'جاري تنزيل الملف المضغوط...');
+        await sleep(200);
+
+        const zipBlob = await zip.generateAsync({ type: 'blob' });
+        stopAnim();
+
+        const url = URL.createObjectURL(zipBlob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `${baseName}.zip`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+
+        localStorage.removeItem('lotus_system_modified');
+        setStatus(100, 'تمت العملية بنجاح. مع السلامة!');
+
+        if (iconContainer) {
+            iconContainer.innerHTML = '<i class="fas fa-check-circle" style="color:var(--accent-emerald);"></i>';
+            iconContainer.style.color = 'var(--accent-emerald)';
+        }
+        
+        if (titleEl) titleEl.textContent = 'تم بنجاح!';
+        
+        if (subtitleEl) subtitleEl.textContent = 'تم حفظ النسخة الاحتياطية بنجاح وتسجيل الخروج الآمن.';
+        
+        if (progressEl) {
+            progressEl.style.background = 'var(--accent-emerald)';
+        }
+
+        setTimeout(() => {
+            if (window.logoutUser) window.logoutUser();
+            location.reload();
+        }, 2000);
+
+    } catch (err) {
+        console.error('Backup error:', err);
+        stopAnim();
+        
+        if (iconContainer) {
+            iconContainer.innerHTML = '<i class="fas fa-exclamation-triangle" style="color:var(--accent-rose);"></i>';
+            iconContainer.style.color = 'var(--accent-rose)';
+        }
+        
+        if (titleEl) titleEl.textContent = 'حدث خطأ!';
+        
+        setStatus(100, 'خطأ: ' + err.message);
+        setTimeout(() => {
+            if (confirm('حدث خطأ أثناء أخذ النسخة الاحتياطية. هل تريد إغلاق النظام وتسجيل الخروج على أي حال؟')) {
+                if (window.logoutUser) window.logoutUser();
+                location.reload();
+            } else {
+                if (modal) modal.style.display = 'none';
+            }
+        }, 2500);
+    }
+}
+
+    (function() {
+        const saved = localStorage.getItem('dash_theme') || 'dark';
+        document.body.setAttribute('data-theme', saved);
+        document.querySelector('#themeBtn i').className = saved === 'dark' ? 'fas fa-sun' : 'fas fa-moon';
+    })();
+</script>
+</body>
+</html>

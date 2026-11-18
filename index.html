@@ -8,17 +8,30 @@
 
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.rtl.min.css" rel="stylesheet">
 <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
-<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&family=Changa:wght@600;700;800&display=swap" rel="stylesheet">
+
+<!-- Excel & Zip Libraries for Backup -->
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+<script src="auth.js"></script>
 
 <style>
 :root{
-  --bg1:#0a1330;
-  --bg2:#10224f;
+  --bg1:#070d22;
+  --bg2:#0f1c40;
+  --bg-card:#141b38;
   --gold:#f5c451;
   --gold2:#ffe29a;
   --pink:#ff7eb6;
   --teal:#2ee6c5;
   --blue:#4d8dff;
+  --emerald:#10b981;
+  --rose:#f43f5e;
+  --amber:#f59e0b;
   --card:rgba(255,255,255,.07);
   --card-border:rgba(255,255,255,.14);
   --text:#eef3ff;
@@ -29,7 +42,7 @@ html,body{min-height:100%}
 body{
   font-family:'Cairo',system-ui,-apple-system,'Segoe UI',Tahoma,sans-serif;
   color:var(--text);
-  background:linear-gradient(160deg,var(--bg1),var(--bg2) 55%,#1a1346);
+  background:linear-gradient(155deg,var(--bg1),var(--bg2) 55%,#17123d);
   background-attachment:fixed;
   overflow-x:hidden;
 }
@@ -37,18 +50,43 @@ body{
 /* ---------- animated background ---------- */
 #bg{position:fixed;inset:0;z-index:0;pointer-events:none}
 .blob{
-  position:fixed;border-radius:50%;filter:blur(80px);opacity:.35;z-index:0;pointer-events:none;
+  position:fixed;border-radius:50%;filter:blur(85px);opacity:.35;z-index:0;pointer-events:none;
   animation:float 14s ease-in-out infinite;
 }
-.blob.b1{width:340px;height:340px;background:var(--blue);top:-80px;right:-60px}
-.blob.b2{width:300px;height:300px;background:var(--pink);bottom:-80px;left:-60px;animation-delay:-5s}
-.blob.b3{width:240px;height:240px;background:var(--teal);top:45%;left:35%;opacity:.18;animation-delay:-9s}
+.blob.b1{width:360px;height:360px;background:var(--blue);top:-80px;right:-60px}
+.blob.b2{width:320px;height:320px;background:var(--pink);bottom:-80px;left:-60px;animation-delay:-5s}
+.blob.b3{width:260px;height:260px;background:var(--teal);top:45%;left:35%;opacity:.18;animation-delay:-9s}
 @keyframes float{
   0%,100%{transform:translate(0,0) scale(1)}
-  50%{transform:translate(30px,-40px) scale(1.12)}
+  50%{transform:translate(35px,-45px) scale(1.14)}
 }
 
 main,header{position:relative;z-index:1}
+
+/* ---------- Top Bar for Backup Action ---------- */
+.top-action-bar{
+  position:fixed;top:18px;left:20px;z-index:100;
+  display:flex;align-items:center;gap:12px;
+}
+.btn-backup-top{
+  display:inline-flex;align-items:center;gap:8px;
+  background:linear-gradient(135deg,rgba(245,196,81,.22),rgba(255,126,182,.18));
+  border:1px solid rgba(245,196,81,.45);
+  color:#fff;padding:8px 18px;border-radius:999px;
+  font-size:.86rem;font-weight:700;cursor:pointer;
+  backdrop-filter:blur(10px);
+  box-shadow:0 6px 20px rgba(0,0,0,.35),0 0 15px rgba(245,196,81,.2);
+  transition:all .3s cubic-bezier(.2,.9,.3,1.2);
+}
+.btn-backup-top i{color:var(--gold);font-size:1.05rem;transition:transform .3s}
+.btn-backup-top:hover{
+  background:linear-gradient(135deg,rgba(245,196,81,.35),rgba(255,126,182,.3));
+  border-color:var(--gold2);
+  transform:translateY(-2px) scale(1.04);
+  box-shadow:0 10px 28px rgba(0,0,0,.45),0 0 25px rgba(245,196,81,.4);
+  color:#fff;
+}
+.btn-backup-top:hover i{transform:rotate(360deg)}
 
 /* ---------- header ---------- */
 .hero{
@@ -127,7 +165,7 @@ main,header{position:relative;z-index:1}
 
 /* ---------- section ---------- */
 .section-title{
-  text-align:center;font-weight:700;font-size:1.15rem;margin:0 0 1.4rem;color:var(--muted);
+  text-align:center;font-weight:700;font-size:1.15rem;margin:0 0 1.5rem;color:var(--muted);
 }
 .section-title span{
   color:var(--text);position:relative;padding:0 .4rem;
@@ -137,112 +175,126 @@ main,header{position:relative;z-index:1}
   background:linear-gradient(90deg,var(--gold),var(--pink),var(--teal));
 }
 
+/* ---------- Grid with side-by-side Layout ---------- */
 .grid{
-  display:flex;flex-wrap:wrap;justify-content:center;gap:1.35rem;
-  max-width:1260px;margin:0 auto;padding:0 1rem 2.8rem;
-  perspective:900px;
+  display:flex;
+  flex-wrap:wrap;
+  justify-content:center;
+  align-items:stretch;
+  gap:1.15rem;
+  max-width:1480px;margin:0 auto;padding:0 1rem 3.4rem;
+  perspective:1000px;
 }
 
-/* ---------- compact cards ---------- */
+/* ---------- attractive compact cards ---------- */
 .sys-card{
   --c1:var(--blue);--c2:var(--teal);
   --mx:50%;--my:50%;
-  width:236px;
+  width:195px;
+  flex:0 1 195px;
   position:relative;
   display:flex;flex-direction:column;align-items:center;text-align:center;
-  padding:1.7rem 1.2rem 1.3rem;
+  padding:1.6rem 1rem 1.25rem;
   border-radius:24px;
-  background:var(--card);
+  background:linear-gradient(160deg,rgba(255,255,255,.08),rgba(255,255,255,.025));
   border:1px solid var(--card-border);
-  backdrop-filter:blur(10px);
+  backdrop-filter:blur(14px);
   color:var(--text);text-decoration:none;
   transform-style:preserve-3d;
-  transition:transform .18s ease-out,box-shadow .3s,border-color .3s;
-  opacity:0;animation:cardIn .7s cubic-bezier(.2,.9,.3,1.2) forwards;
+  transition:transform .22s cubic-bezier(.2,.9,.3,1.2),box-shadow .35s,border-color .35s,background .35s;
+  opacity:0;animation:cardIn .75s cubic-bezier(.2,.9,.3,1.2) forwards;
   overflow:hidden;
+  box-shadow:0 8px 24px rgba(0,0,0,.28);
 }
-.sys-card:nth-child(1){animation-delay:.85s}
-.sys-card:nth-child(2){animation-delay:.97s}
-.sys-card:nth-child(3){animation-delay:1.09s}
-.sys-card:nth-child(4){animation-delay:1.21s}
-.sys-card:nth-child(5){animation-delay:1.33s}
+.sys-card:nth-child(1){animation-delay:.75s}
+.sys-card:nth-child(2){animation-delay:.83s}
+.sys-card:nth-child(3){animation-delay:.91s}
+.sys-card:nth-child(4){animation-delay:.99s}
+.sys-card:nth-child(5){animation-delay:1.07s}
+.sys-card:nth-child(6){animation-delay:1.15s}
+.sys-card:nth-child(7){animation-delay:1.23s}
 @keyframes cardIn{from{opacity:0;transform:translateY(40px) scale(.85)}to{opacity:1;transform:none}}
 
 .sys-card::before{ /* cursor glow */
   content:"";position:absolute;inset:0;
-  background:radial-gradient(160px circle at var(--mx) var(--my),rgba(255,255,255,.2),transparent 60%);
+  background:radial-gradient(180px circle at var(--mx) var(--my),rgba(255,255,255,.24),transparent 60%);
   opacity:0;transition:opacity .3s;pointer-events:none;
 }
 .sys-card::after{ /* top accent line */
-  content:"";position:absolute;top:0;right:0;left:0;height:3px;
+  content:"";position:absolute;top:0;right:0;left:0;height:4px;
   background:linear-gradient(90deg,var(--c1),var(--c2));
   transform:scaleX(.25);transition:transform .4s;
 }
 .sys-card:hover{
-  border-color:rgba(255,255,255,.35);
-  box-shadow:0 14px 34px rgba(0,0,0,.4),0 0 26px color-mix(in srgb,var(--c1) 45%,transparent);
+  border-color:rgba(255,255,255,.45);
+  box-shadow:0 18px 40px rgba(0,0,0,.5),0 0 35px color-mix(in srgb,var(--c1) 50%,transparent);
   color:var(--text);
+  background:linear-gradient(160deg,rgba(255,255,255,.12),rgba(255,255,255,.04));
 }
 .sys-card:hover::before{opacity:1}
 .sys-card:hover::after{transform:scaleX(1)}
 
 .ico{
   position:relative;
-  width:82px;height:82px;border-radius:26px;
-  display:grid;place-items:center;font-size:2.5rem;color:#fff;
+  width:84px;height:84px;border-radius:28px;
+  display:grid;place-items:center;font-size:2.6rem;color:#fff;
   background:linear-gradient(135deg,var(--c1),var(--c2));
-  box-shadow:0 10px 26px color-mix(in srgb,var(--c1) 50%,transparent),inset 0 2px 0 rgba(255,255,255,.35);
-  margin-bottom:1.05rem;
-  transition:transform .4s cubic-bezier(.3,1.6,.5,1);
-  transform:translateZ(34px);
+  box-shadow:0 12px 30px color-mix(in srgb,var(--c1) 55%,transparent),inset 0 2px 0 rgba(255,255,255,.45);
+  margin-bottom:1.15rem;
+  transition:transform .4s cubic-bezier(.3,1.6,.5,1),box-shadow .4s;
+  transform:translateZ(36px);
 }
-.ico > i{filter:drop-shadow(0 3px 6px rgba(0,0,0,.25))}
+.ico > i{filter:drop-shadow(0 4px 8px rgba(0,0,0,.3))}
 .ico::before{ /* pulsing ring */
-  content:"";position:absolute;inset:-8px;border-radius:32px;
+  content:"";position:absolute;inset:-8px;border-radius:34px;
   border:2px solid var(--c1);opacity:.55;
   animation:ring 2.8s ease-out infinite;
 }
-@keyframes ring{0%{transform:scale(.92);opacity:.7}100%{transform:scale(1.22);opacity:0}}
-.ico .badge-ico{ /* small companion icon */
+@keyframes ring{0%{transform:scale(.92);opacity:.75}100%{transform:scale(1.24);opacity:0}}
+.ico .badge-ico{ /* companion badge */
   position:absolute;bottom:-9px;left:-9px;
-  width:32px;height:32px;border-radius:50%;
+  width:34px;height:34px;border-radius:50%;
   display:grid;place-items:center;font-size:.95rem;
   background:#fff;color:var(--c1);
-  box-shadow:0 5px 14px rgba(0,0,0,.35);
+  box-shadow:0 6px 16px rgba(0,0,0,.38);
   animation:bob 3s ease-in-out infinite;
 }
 .ico .badge-ico i{filter:none}
 @keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-4px)}}
-.sys-card:hover .ico{transform:translateZ(46px) rotate(-6deg) scale(1.1)}
+.sys-card:hover .ico{transform:translateZ(50px) rotate(-6deg) scale(1.12);box-shadow:0 16px 36px color-mix(in srgb,var(--c1) 75%,transparent)}
 
-.sys-card h3{font-size:1.22rem;font-weight:800;margin:0 0 .35rem;line-height:1.4}
-.sys-card p{font-size:.85rem;color:var(--muted);margin:0 0 .75rem;line-height:1.65;min-height:3.3em}
-.tags{display:flex;flex-wrap:wrap;justify-content:center;gap:.35rem;margin:0 0 1rem}
-.tag{font-size:.7rem;font-weight:600;padding:.15rem .65rem;border-radius:999px;background:rgba(255,255,255,.09);border:1px solid rgba(255,255,255,.12);color:var(--text)}
+.sys-card h3{font-size:1.24rem;font-weight:800;margin:0 0 .4rem;line-height:1.4}
+.sys-card p{font-size:.85rem;color:var(--muted);margin:0 0 .8rem;line-height:1.65;min-height:3.3em}
+.tags{display:flex;flex-wrap:wrap;justify-content:center;gap:.4rem;margin:0 0 1.1rem}
+.tag{font-size:.7rem;font-weight:700;padding:.2rem .75rem;border-radius:999px;background:rgba(255,255,255,.09);border:1px solid rgba(255,255,255,.14);color:var(--text)}
 .go{
-  margin-top:auto;font-size:.85rem;font-weight:700;
-  display:inline-flex;align-items:center;gap:.4rem;
-  padding:.4rem 1.1rem;border-radius:999px;
+  margin-top:auto;font-size:.86rem;font-weight:700;
+  display:inline-flex;align-items:center;gap:.45rem;
+  padding:.45rem 1.25rem;border-radius:999px;
   background:rgba(255,255,255,.1);
-  transition:background .3s,gap .3s,color .3s;
+  border:1px solid rgba(255,255,255,.08);
+  transition:all .3s cubic-bezier(.2,.9,.3,1.2);
 }
-.sys-card:hover .go{background:linear-gradient(90deg,var(--c1),var(--c2));gap:.6rem;color:#fff}
+.sys-card:hover .go{background:linear-gradient(90deg,var(--c1),var(--c2));gap:.7rem;color:#fff;border-color:transparent;box-shadow:0 4px 15px color-mix(in srgb,var(--c1) 40%,transparent)}
 
 .num{
-  position:absolute;top:12px;right:16px;font-size:.8rem;font-weight:700;
-  color:rgba(255,255,255,.35);
+  position:absolute;top:14px;right:18px;font-size:.82rem;font-weight:800;
+  color:rgba(255,255,255,.35);font-family:'Changa',sans-serif;
 }
 
-/* colour themes */
+/* Color themes with vibrant gradients */
 .t1{--c1:#4d8dff;--c2:#2ee6c5}
 .t2{--c1:#a66bff;--c2:#ff7eb6}
 .t3{--c1:#34d27b;--c2:#b6f04a}
 .t4{--c1:#ff9a3c;--c2:#ffd04a}
 .t5{--c1:#8d97b5;--c2:#5b6585}
+.t-withdraw{--c1:#10b981;--c2:#06b6d4}
+.t-cert{--c1:#8b5cf6;--c2:#ec4899}
+.t-desk{--c1:#06b6d4;--c2:#3b82f6}
 
 /* coming soon */
 .soon{cursor:not-allowed;filter:saturate(.55)}
-.soon:hover{transform:none!important}
+.soon:hover{transform:none!important;box-shadow:0 8px 24px rgba(0,0,0,.28)!important}
 .ribbon{
   position:absolute;top:18px;left:-34px;width:128px;text-align:center;
   background:linear-gradient(90deg,var(--gold),#ff9a3c);color:#2a1a00;
@@ -251,27 +303,59 @@ main,header{position:relative;z-index:1}
 }
 .soon .go{opacity:.7}
 
-/* شاشة كبيرة: الخمس كروت جنب بعض في صف واحد */
-@media (min-width:1180px){
-  .grid{flex-wrap:nowrap;gap:1.1rem}
-  .sys-card{width:auto;flex:1 1 0;min-width:0}
+/* شاشة عريضة: توزيع متساوي جميل في صفوف جنب بعض */
+/* شاشات سطح المكتب واللابتوب العادية (الزوم 100%): السبعة كروت جنب بعض في صف واحد متناسق */
+@media (min-width:1280px){
+  .grid{
+    flex-wrap:nowrap;
+    gap:1rem;
+    padding:0 1.2rem 3.4rem;
+  }
+  .sys-card{
+    width:auto;
+    flex:1 1 0;
+    min-width:160px;
+    padding:1.6rem .8rem 1.25rem;
+  }
+  .sys-card h3{font-size:1.1rem}
+  .sys-card p{font-size:.8rem;min-height:3.6em}
+  .ico{width:74px;height:74px;font-size:2.3rem}
 }
-/* موبايل: كارتين جنب بعض */
-@media (max-width:540px){
+
+/* شاشات متوسطة */
+@media (max-width:1279px) and (min-width:768px){
+  .grid{gap:1.1rem}
+  .sys-card{width:calc(25% - 1.1rem);min-width:180px}
+}
+
+/* موبايل وتابلت صغير: كارتين جنب بعض */
+@media (max-width:767px){
+  .top-action-bar{top:12px;left:12px}
+  .btn-backup-top{padding:6px 12px;font-size:.76rem}
   .grid{gap:.75rem;padding-left:.75rem;padding-right:.75rem}
-  .sys-card{width:calc(50% - .4rem);padding:1.3rem .7rem 1rem;border-radius:20px}
-  .ico{width:62px;height:62px;border-radius:20px;font-size:1.9rem;margin-bottom:.9rem}
+  .sys-card{width:calc(50% - .45rem);flex:0 0 calc(50% - .45rem);padding:1.35rem .7rem 1.05rem;border-radius:20px}
+  .ico{width:64px;height:64px;border-radius:20px;font-size:1.95rem;margin-bottom:.9rem}
   .ico .badge-ico{width:26px;height:26px;font-size:.78rem;bottom:-7px;left:-7px}
-  .sys-card h3{font-size:1rem}
+  .sys-card h3{font-size:1.02rem}
   .sys-card p{font-size:.74rem;min-height:4.6em}
   .tags{display:none}
-  .go{font-size:.76rem;padding:.3rem .8rem}
-  .num{font-size:.7rem;top:9px;right:12px}
+  .go{font-size:.76rem;padding:.32rem .85rem}
+  .num{font-size:.72rem;top:10px;right:12px}
   .ribbon{top:14px;left:-36px;width:112px;font-size:.66rem}
 }
 @media (prefers-reduced-motion:reduce){
   *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
   .sys-card{opacity:1}
+}
+
+/* Modal Animations */
+@keyframes pulseGlow {
+    0%,100% { transform:scale(1); opacity:0.85; filter:drop-shadow(0 0 6px rgba(245,158,11,0.5)); }
+    50% { transform:scale(1.12); opacity:1; filter:drop-shadow(0 0 16px rgba(245,158,11,0.9)); }
+}
+@keyframes shimmer {
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
 }
 </style>
 </head>
@@ -280,11 +364,18 @@ main,header{position:relative;z-index:1}
 <canvas id="bg"></canvas>
 <div class="blob b1"></div><div class="blob b2"></div><div class="blob b3"></div>
 
+<!-- ========== TOP ACTION: BACKUP BUTTON ========== -->
+<div class="top-action-bar">
+  <button class="btn-backup-top" onclick="closeAndBackup()" title="أخذ نسخة احتياطية لكافة الأنظمة فوراً">
+    <i class="fas fa-cloud-arrow-down"></i>
+    <span>نسخة احتياطية للأنظمة</span>
+  </button>
+</div>
+
 <!-- ========== HEADER ========== -->
 <header class="hero">
   <div class="logo-wrap">
     <div class="logo-core">
-      <!-- ضع ملف الشعار باسم logo.png بجانب هذا الملف -->
       <img src="logo.png" alt="شعار جامعة اللوتس" id="logoImg">
     </div>
   </div>
@@ -308,56 +399,118 @@ main,header{position:relative;z-index:1}
 
   <div class="grid" id="grid">
 
-    <a class="sys-card t1" href="https://boles2025.github.io/LUM.SYSTEM.AFFAIRS/index.html" target="_blank" rel="noopener noreferrer">
-      <span class="num">01</span>
-      <div class="ico"><i class="bi bi-mortarboard-fill"></i><span class="badge-ico"><i class="bi bi-award-fill"></i></span></div>
-      <h3>شئون الطلاب</h3>
-      <p>إدارة شئون الطلاب كاملة، سحب الطلاب وحساب الشهادات</p>
-      <div class="tags"><span class="tag">سحب الطلاب</span><span class="tag">الشهادات</span></div>
-      <span class="go">فتح النظام <i class="bi bi-arrow-up-left"></i></span>
-    </a>
-
+    <!-- 01: برنامج مراجعة استلام الملفات وأرشفتها -->
     <a class="sys-card t2" href="https://lum20262026.github.io/ReviewFIlesStudent/" target="_blank" rel="noopener noreferrer">
-      <span class="num">02</span>
-      <div class="ico"><i class="bi bi-file-earmark-check-fill"></i><span class="badge-ico"><i class="bi bi-archive-fill"></i></span></div>
+      <span class="num">01</span>
+      <div class="ico">
+        <i class="bi bi-file-earmark-check-fill"></i>
+        <span class="badge-ico"><i class="bi bi-archive-fill"></i></span>
+      </div>
       <h3>مراجعة الملفات</h3>
-      <p>مراجعة استلام ملفات الطلاب وأرشفتها</p>
-      <div class="tags"><span class="tag">مراجعة</span><span class="tag">أرشفة</span></div>
+      <p>إدارة ومراجعة استلام ملفات الطلاب وأرشفتها إلكترونياً</p>
+      <div class="tags"><span class="tag">مراجعة الاستلام</span><span class="tag">أرشفة الملفات</span></div>
       <span class="go">فتح النظام <i class="bi bi-arrow-up-left"></i></span>
     </a>
 
+    <!-- 02: برنامج تسليم الكارنيهات للطلاب -->
+    <a class="sys-card t4" href="https://lum20262026.github.io/StudentId/index.html" target="_blank" rel="noopener noreferrer">
+      <span class="num">02</span>
+      <div class="ico">
+        <i class="bi bi-person-vcard-fill"></i>
+        <span class="badge-ico"><i class="bi bi-qr-code-scan"></i></span>
+      </div>
+      <h3>تسليم الكارنيهات</h3>
+      <p>برنامج تسليم الكارنيهات للطلاب ومسح QR والمتابعة</p>
+      <div class="tags"><span class="tag">تسليم الكارنيه</span><span class="tag">مسح QR</span></div>
+      <span class="go">فتح النظام <i class="bi bi-arrow-up-left"></i></span>
+    </a>
+
+    <!-- 03: برنامج إدارة التربية العسكرية ومتابعة نتائج الطلاب -->
     <a class="sys-card t3" href="https://lum20262026.github.io/Military/" target="_blank" rel="noopener noreferrer">
       <span class="num">03</span>
-      <div class="ico"><i class="bi bi-shield-fill-check"></i><span class="badge-ico"><i class="bi bi-star-fill"></i></span></div>
+      <div class="ico">
+        <i class="bi bi-shield-fill-check"></i>
+        <span class="badge-ico"><i class="bi bi-star-fill"></i></span>
+      </div>
       <h3>التربية العسكرية</h3>
-      <p>إدارة التربية العسكرية ومتابعة نتائج الطلاب</p>
-      <div class="tags"><span class="tag">النتائج</span><span class="tag">المتابعة</span></div>
+      <p>إدارة التربية العسكرية ومتابعة نتائج الطلاب والفرق</p>
+      <div class="tags"><span class="tag">النتائج</span><span class="tag">المتابعة العسكرية</span></div>
       <span class="go">فتح النظام <i class="bi bi-arrow-up-left"></i></span>
     </a>
 
-    <a class="sys-card t4" href="https://lum20262026.github.io/StudentId/index.html" target="_blank" rel="noopener noreferrer">
-      <span class="num">04</span>
-      <div class="ico"><i class="bi bi-person-vcard-fill"></i><span class="badge-ico"><i class="bi bi-qr-code-scan"></i></span></div>
-      <h3>تسليم الكارنيهات</h3>
-      <p>تسليم كارنيهات الطلاب ومتابعتها</p>
-      <div class="tags"><span class="tag">تسليم</span><span class="tag">مسح QR</span></div>
-      <span class="go">فتح النظام <i class="bi bi-arrow-up-left"></i></span>
-    </a>
-
-    <!-- عند جاهزية نظام التجنيد: غيّر div إلى a وأضف href و target="_blank" واحذف الكلاس soon والشريط -->
+    <!-- 04: نظام إدارة التجنيد (قريباً) -->
     <div class="sys-card t5 soon" aria-disabled="true">
       <span class="ribbon">قريباً</span>
-      <span class="num">05</span>
-      <div class="ico"><i class="bi bi-flag-fill"></i><span class="badge-ico"><i class="bi bi-clock-history"></i></span></div>
+      <span class="num">04</span>
+      <div class="ico">
+        <i class="bi bi-flag-fill"></i>
+        <span class="badge-ico"><i class="bi bi-clock-history"></i></span>
+      </div>
       <h3>إدارة التجنيد</h3>
-      <p>نظام إدارة التجنيد — قيد التجهيز</p>
+      <p>نظام إدارة التجنيد والمتابعة العسكرية — قيد التجهيز</p>
       <div class="tags"><span class="tag">قريباً</span></div>
       <span class="go"><i class="bi bi-hourglass-split"></i> قريباً</span>
     </div>
 
-  </div>
-</main>
+    <!-- 05: إدارة سحب الملفات (بصلاحية وباسورد يحدده الأدمن) -->
+    <a class="sys-card t-withdraw" href="systems/file-withdrawal/index.html">
+      <span class="num">05</span>
+      <div class="ico">
+        <i class="bi bi-box-arrow-up-right"></i>
+        <span class="badge-ico"><i class="bi bi-shield-lock-fill"></i></span>
+      </div>
+      <h3>سحب الملفات</h3>
+      <p>تسجيل طلبات سحب الملفات ومتابعة الدفع (محمي بصلاحية الأدمن)</p>
+      <div class="tags"><span class="tag">سحب الملفات</span><span class="tag">صلاحية خاصة</span></div>
+      <span class="go">فتح النظام <i class="bi bi-arrow-up-left"></i></span>
+    </a>
 
+    <!-- 06: حساب الشهادات المعادلة -->
+    <a class="sys-card t-cert" href="systems/certificate-calc/index.html" onclick="localStorage.removeItem('cert_last_student');">
+      <span class="num">06</span>
+      <div class="ico">
+        <i class="bi bi-calculator-fill"></i>
+        <span class="badge-ico"><i class="bi bi-award-fill"></i></span>
+      </div>
+      <h3>حساب الشهادات</h3>
+      <p>حساب النسبة المئوية للشهادات المعادلة الأمريكية والأزهرية</p>
+      <div class="tags"><span class="tag">معادلات</span><span class="tag">حساب النسبة</span></div>
+      <span class="go">فتح النظام <i class="bi bi-arrow-up-left"></i></span>
+    </a>
+
+    <!-- 07: الخدمات الطلابية والمكتبية -->
+    <a class="sys-card t-desk" href="systems/desk-services/index.html">
+      <span class="num">07</span>
+      <div class="ico">
+        <i class="bi bi-printer-fill"></i>
+        <span class="badge-ico"><i class="bi bi-file-earmark-text-fill"></i></span>
+      </div>
+      <h3>الخدمات الطلابية</h3>
+      <p>تصفح وطباعة كافة النماذج والمستندات الورقية والخدمات</p>
+      <div class="tags"><span class="tag">نماذج</span><span class="tag">طباعة</span></div>
+      <span class="go">فتح النظام <i class="bi bi-arrow-up-left"></i></span>
+    </a>
+
+  </div></main>
+
+<!-- ========== BACKUP PROGRESS MODAL ========== -->
+<div id="shutdown-modal" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.85);z-index:20000;justify-content:center;align-items:center;backdrop-filter:blur(8px);">
+    <div style="position:relative;background:linear-gradient(160deg,#141b38,#0a1029);border:1px solid rgba(245,196,81,0.35);border-radius:24px;padding:36px 40px;text-align:center;min-width:340px;max-width:440px;box-shadow:0 25px 70px rgba(0,0,0,0.6),0 0 40px rgba(245,196,81,0.2);">
+        <div id="shutdown-icon-container" style="font-size:2.6rem;margin-bottom:14px;color:var(--gold);display:inline-block;animation:pulseGlow 1.6s ease-in-out infinite;">
+            <i class="fas fa-database"></i>
+        </div>
+
+        <div id="shutdown-title" style="font-weight:800;color:#fff;font-size:1.25rem;margin-bottom:6px;">جاري أخذ نسخة احتياطية لكافة الأنظمة...</div>
+        <div id="shutdown-subtitle" style="display:none;"></div>
+        <div id="shutdown-status" style="font-size:0.88rem;color:var(--muted);margin-bottom:18px;">جاري التهيئة...</div>
+
+        <!-- Progress Container -->
+        <div style="position:relative;width:100%;height:14px;background:#070d22;border-radius:50px;overflow:hidden;border:1px solid rgba(255,255,255,0.15);">
+            <div id="shutdown-progress" style="width:0%;height:100%;background:linear-gradient(90deg,var(--gold),var(--emerald));border-radius:50px;transition:width 0.4s ease;box-shadow:0 0 12px rgba(16,185,129,0.6);"></div>
+        </div>
+        <div id="shutdown-percent" style="margin-top:10px;font-family:'Changa',sans-serif;font-weight:800;font-size:1.05rem;color:var(--emerald);direction:ltr;">0%</div>
+    </div>
+</div>
 
 <script>
 /* ---- fallback if logo.png is missing: draw a lotus ---- */
@@ -380,7 +533,6 @@ main,header{position:relative;z-index:1}
     '</g><rect x="20" y="82" width="60" height="4" rx="2" fill="#f5c451"/></svg>';
   }
   img.addEventListener('error',useFallback);
-  // in case the image already failed before the listener was attached
   if(img.complete && img.naturalWidth===0) useFallback();
 })();
 
@@ -438,6 +590,320 @@ main,header{position:relative;z-index:1}
   }
   size();addEventListener('resize',size);draw();
 })();
+
+/* ==========================================================
+   Full Automated Comprehensive Backup for All Systems
+   ========================================================== */
+function lsGet(key) {
+    try { return JSON.parse(localStorage.getItem(key) || 'null'); } catch(e) { return null; }
+}
+
+function sleep(ms) {
+    return new Promise(r => setTimeout(r, ms));
+}
+
+async function colorWorksheetTabs(excelBuffer, colors) {
+    if (typeof JSZip === 'undefined') return excelBuffer;
+    try {
+        const zip = await JSZip.loadAsync(excelBuffer);
+        for (let i = 0; i < colors.length; i++) {
+            const color = colors[i];
+            if (!color) continue;
+            const sheetPath = `xl/worksheets/sheet${i + 1}.xml`;
+            const sheetFile = zip.file(sheetPath);
+            if (sheetFile) {
+                let xmlText = await sheetFile.async("text");
+                if (xmlText.indexOf("<sheetPr") !== -1) {
+                    if (xmlText.indexOf("tabColor") !== -1) {
+                        xmlText = xmlText.replace(/<tabColor[^>]*\/>/, `<tabColor rgb="FF${color}"/>`);
+                    } else {
+                        xmlText = xmlText.replace("<sheetPr", `<sheetPr><tabColor rgb="FF${color}"/>`);
+                    }
+                } else {
+                    const wsIndex = xmlText.indexOf("<worksheet");
+                    if (wsIndex !== -1) {
+                        const insertIndex = xmlText.indexOf(">", wsIndex) + 1;
+                        xmlText = xmlText.slice(0, insertIndex) + `<sheetPr><tabColor rgb="FF${color}"/></sheetPr>` + xmlText.slice(insertIndex);
+                    }
+                }
+                zip.file(sheetPath, xmlText);
+            }
+        }
+        return await zip.generateAsync({ type: "array" });
+    } catch (e) {
+        return excelBuffer;
+    }
+}
+
+async function closeAndBackup(isClosing) {
+    const modal = document.getElementById('shutdown-modal');
+    if (modal) { modal.style.display = 'flex'; }
+
+    const progress = document.getElementById('shutdown-progress');
+    const status = document.getElementById('shutdown-status');
+
+    const setStatus = (pct, text) => {
+        if (progress) progress.style.width = pct + '%';
+        if (status) status.textContent = text;
+        const pctEl = document.getElementById('shutdown-percent');
+        if (pctEl) pctEl.textContent = Math.round(pct) + '%';
+    };
+
+    const iconContainer = document.getElementById('shutdown-icon-container');
+    const titleEl = document.getElementById('shutdown-title');
+
+    try {
+        setStatus(15, 'جاري الاتصال وتجهيز كافة بيانات الأنظمة...');
+
+        const safeTimeout = (promise, ms) => Promise.race([
+            promise,
+            new Promise(resolve => setTimeout(() => resolve(null), ms))
+        ]);
+
+        const authDb = window.AUTH_DB && !window.AUTH_IS_OFFLINE ? window.AUTH_DB : null;
+        const withDb = window.WITHDRAWAL_DB && !window.AUTH_IS_OFFLINE ? window.WITHDRAWAL_DB : null;
+
+        const stuTask = authDb ? safeTimeout(authDb.ref('students').once('value'), 2500).catch(() => null) : Promise.resolve(null);
+        const wTask = withDb ? safeTimeout(withDb.ref('withdrawalRequests').once('value'), 2500).catch(() => null) : Promise.resolve(null);
+        const empTask = authDb ? safeTimeout(authDb.ref('employees').once('value'), 2500).catch(() => null) : Promise.resolve(null);
+        const logTask = authDb ? safeTimeout(authDb.ref('activityLog').once('value'), 2500).catch(() => null) : Promise.resolve(null);
+        const certTask = authDb ? safeTimeout(authDb.ref('certificateRecords').once('value'), 2500).catch(() => null) : Promise.resolve(null);
+        const colTask = withDb ? safeTimeout(withDb.ref('colleges').once('value'), 2500).catch(() => null) : Promise.resolve(null);
+        const cfgTask = authDb ? safeTimeout(authDb.ref('settings/config').once('value'), 2500).catch(() => null) : Promise.resolve(null);
+
+        const [stuSnap, wSnap, empSnap, logSnap, certSnap, colSnap, cfgSnap] = await Promise.all([
+            stuTask, wTask, empTask, logTask, certTask, colTask, cfgTask
+        ]);
+
+        setStatus(45, 'جاري استخراج السجلات وتجميع الجداول...');
+
+        let studentsArr = lsGet('lotus_students') || [];
+        if (stuSnap && stuSnap.exists()) {
+            const fb = stuSnap.val() || {};
+            const fbArr = Object.keys(fb).map(k => ({ id: k, ...fb[k] }));
+            const map = {};
+            studentsArr.forEach(s => map[s.id] = s);
+            fbArr.forEach(s => map[s.id] = s);
+            studentsArr = Object.values(map);
+        }
+
+        let withdrawalArr = lsGet('lotus_withdrawalRequests') || [];
+        if (wSnap && wSnap.exists()) {
+            const fb = wSnap.val() || {};
+            const fbArr = Object.keys(fb).map(k => ({ id: k, ...fb[k] }));
+            const map = {};
+            withdrawalArr.forEach(w => map[w.id] = w);
+            fbArr.forEach(w => map[w.id] = w);
+            withdrawalArr = Object.values(map);
+        }
+
+        let employeesArr = lsGet('lotus_employees') || [];
+        if (empSnap && empSnap.exists()) {
+            const fb = empSnap.val() || {};
+            const fbArr = Object.keys(fb).map(k => ({ username: k, ...fb[k] }));
+            const map = {};
+            employeesArr.forEach(e => map[e.username] = e);
+            fbArr.forEach(e => map[e.username] = e);
+            employeesArr = Object.values(map);
+        }
+
+        let logArr = lsGet('lotus_activity_log') || [];
+        if (logSnap && logSnap.exists()) {
+            const fb = logSnap.val() || {};
+            const fbArr = Object.keys(fb).map(k => ({ id: k, ...fb[k] }));
+            const map = {};
+            logArr.forEach(l => map[l.id] = l);
+            fbArr.forEach(l => map[l.id] = l);
+            logArr = Object.values(map);
+        }
+
+        let certRecordsArr = [];
+        try { certRecordsArr = JSON.parse(localStorage.getItem('lotus_certificate_records') || '[]'); } catch(e) {}
+        if (certSnap && certSnap.exists()) {
+            const fb = certSnap.val() || {};
+            const fbArr = Object.keys(fb).map(k => fb[k]);
+            const map = {};
+            certRecordsArr.forEach(c => map[c.id] = c);
+            fbArr.forEach(c => map[c.id] = c);
+            certRecordsArr = Object.values(map);
+        }
+
+        let configObj = lsGet('lotus_config') || {};
+        if (cfgSnap && cfgSnap.exists()) configObj = cfgSnap.val() || {};
+
+        let collegesArr = [];
+        if (colSnap && colSnap.exists()) {
+            const fb = colSnap.val() || {};
+            Object.keys(fb).forEach(k => { collegesArr.push({ id: k, ...fb[k] }); });
+        }
+
+        // Fetch Desk Services
+        let deskServicesArr = [];
+        let deskRequestsArr = [];
+        try {
+            if (authDb) {
+                const dsSnap = await safeTimeout(authDb.ref('deskServices').once('value'), 1500);
+                if (dsSnap && dsSnap.exists()) deskServicesArr = Object.values(dsSnap.val());
+                const drSnap = await safeTimeout(authDb.ref('deskServicesStudentRequests').once('value'), 1500);
+                if (drSnap && drSnap.exists()) deskRequestsArr = Object.values(drSnap.val());
+            }
+        } catch(e) {}
+        if (!deskServicesArr.length) {
+            try { deskServicesArr = JSON.parse(localStorage.getItem('deskServices') || '[]'); } catch(e) {}
+        }
+        if (!deskRequestsArr.length) {
+            try { deskRequestsArr = JSON.parse(localStorage.getItem('deskServicesStudentRequests') || '[]'); } catch(e) {}
+        }
+
+        setStatus(70, 'جاري إنشاء أوراق إكسيل وملفات النسخة الاحتياطية...');
+        await sleep(150);
+
+        const attachmentDefs = configObj.globalAttachments || [];
+
+        const sSheet = studentsArr.map(s => {
+            const deliveredDocs = [];
+            const missingDocs = [];
+            attachmentDefs.forEach(att => {
+                const rec = (s.delivery && s.delivery[att.id]) || {};
+                if (rec.delivered === true) {
+                    deliveredDocs.push(att.name);
+                } else {
+                    missingDocs.push(att.name);
+                }
+            });
+            return {
+                'كود الطالب': s.studentCode || s.code || '',
+                'اسم الطالب': s.studentName || s.name || '',
+                'الرقم القومي': s.nationalId || s.nid || '',
+                'الكلية': s.college || '',
+                'المستوى': s.level || s.grade || '',
+                'رقم الملف': s.fileNo || '',
+                'رقم الدولاب': s.cabinetNo || '',
+                'المستندات المستلمة': deliveredDocs.join(' - ') || 'لا يوجد',
+                'المستندات الناقصة': missingDocs.join(' - ') || 'لا يوجد',
+                'تاريخ التسجيل': (s.createdAt || s.regDate) ? new Date(s.createdAt || s.regDate).toLocaleDateString('ar-EG') : ''
+            };
+        });
+
+        const wSheet = withdrawalArr.map(w => ({
+            'رقم الملف': w.fileNumber || '',
+            'كود الطالب': w.studentCode || '',
+            'اسم الطالب': w.studentName || '',
+            'الرقم القومي': w.nationalId || '',
+            'الكلية': w.college || '',
+            'الموظف المختص بالسحب': w.staffName || w.employeeName || w.processedBy || '—',
+            'تاريخ السحب': w.withdrawalDate || '',
+            'العام الجامعي': w.academicYear || '',
+            'موقف الدفع': w.paymentStatus || '',
+            'الجامعة المحول إليها': w.transferUniversity || '',
+            'التليفون': w.phone || '',
+            'الملاحظات': w.notes || ''
+        }));
+
+        const certSheet = certRecordsArr.map(rec => ({
+            'اسم الطالب': rec.studentName || '',
+            'نوع الشهادة': rec.certificateLabel || rec.certificateType || '',
+            'النسبة المئوية': rec.totalPercentage ? rec.totalPercentage + '%' : '',
+            'المجموع الفعلي': rec.totalScore || 0,
+            'المجموع المعادل': rec.equivalentScore || 0,
+            'الموظف': rec.employeeName || rec.employeeUsername || '',
+            'تاريخ الحساب': rec.updatedAt ? new Date(rec.updatedAt).toLocaleString('ar-EG') : ''
+        }));
+
+        const deskServicesSheet = deskRequestsArr.map((r, idx) => ({
+            'مسلسل': idx + 1,
+            'رقم الطلب': r.requestNumber || '—',
+            'كود الطالب': r.studentCode || '—',
+            'الرقم القومي': r.nationalId || '—',
+            'اسم الطالب': r.studentName || '—',
+            'الخدمة المطلوبة': r.serviceName || '—',
+            'الكلية': r.college || '—',
+            'الفرقة/المستوى': r.grade || '—',
+            'اسم الموظف': r.staffName || r.createdBy || '—',
+            'تاريخ الطلب': r.requestDate || '—',
+            'حالة الطلب': r.status || '—',
+            'تاريخ التسليم': r.deliveredAt || r.deliveryDate || '—',
+            'ملاحظات': r.notes || '—'
+        }));
+
+        const wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(wSheet), 'سحب الملفات');
+        XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(sSheet), 'سجلات الطلاب');
+        XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(certSheet), 'حساب الشهادات');
+        XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(deskServicesSheet), 'الخدمات الطلابية');
+
+        const jsonBackup = JSON.stringify({
+            version: '2.0',
+            system: 'جامعة اللوتس - النظام المتكامل',
+            exportedAt: new Date().toISOString(),
+            data: {
+                students: studentsArr,
+                withdrawalRequests: withdrawalArr,
+                employees: employeesArr,
+                activityLog: logArr,
+                colleges: collegesArr,
+                config: configObj,
+                deskServices: deskServicesArr,
+                deskServicesStudentRequests: deskRequestsArr
+            }
+        }, null, 2);
+
+        setStatus(88, 'جاري ضغط وحفظ ملفات النسخة الاحتياطية (ZIP)...');
+        await sleep(150);
+
+        const days = ['الأحد', 'الإثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة', 'السبت'];
+        const dayName = days[new Date().getDay()];
+        const dateStr = new Date().toISOString().split('T')[0];
+        const baseName = `نسخة_احتياطية_شاملة_جامعة_اللوتس_${dateStr}_${dayName}`;
+        
+        const zip = new JSZip();
+        const wbout_raw = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
+        let wbout = wbout_raw;
+        try {
+            wbout = await colorWorksheetTabs(wbout_raw, ['10B981', '3B82F6', '8B5CF6', '06B6D4']);
+        } catch(colorErr) {}
+        
+        zip.file(`${baseName}.xlsx`, wbout);
+        zip.file(`${baseName}.json`, jsonBackup);
+
+        setStatus(95, 'جاري تنزيل ملف النسخة الاحتياطية...');
+        const zipBlob = await zip.generateAsync({ type: 'blob' });
+
+        const url = URL.createObjectURL(zipBlob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `${baseName}.zip`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+
+        setStatus(100, 'تم أخذ النسخة الاحتياطية بنجاح!');
+        if (iconContainer) {
+            iconContainer.innerHTML = '<i class="fas fa-check-circle" style="color:var(--emerald);"></i>';
+            iconContainer.style.color = 'var(--emerald)';
+        }
+        if (titleEl) titleEl.textContent = 'تم الحفظ بنجاح!';
+
+        setTimeout(() => {
+            if (modal) modal.style.display = 'none';
+        }, 2200);
+
+    } catch (err) {
+        console.error('Backup error:', err);
+        setStatus(100, 'تم إنهاء العملية');
+        setTimeout(() => {
+            if (modal) modal.style.display = 'none';
+        }, 1500);
+    }
+}
+
+/* Auto backup prompt when closing/leaving page if data changed */
+window.addEventListener('beforeunload', function(e) {
+    if (localStorage.getItem('lotus_system_modified') === 'true') {
+        closeAndBackup(true);
+    }
+});
 </script>
 </body>
 </html>
