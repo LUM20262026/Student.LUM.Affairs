@@ -1504,8 +1504,10 @@
           rows += '<td>' + (r.academicYear||'') + '</td><td><span class="badge-status ' + cls + '">' + pmt + '</span></td>';
           rows += '<td>' + (r.transferUniversity||'-') + '</td><td dir="ltr">' + (r.phone||'-') + '</td><td>' + (r.notes||'-') + '</td>';
           rows += '<td class="no-print"><div class="action-cell">';
-          rows += '<button class="action-btn edit" onclick="editRecord(\'' + r.id + '\')" title="تعديل"><i class="fas fa-pen"></i></button>';
-          rows += '<button class="action-btn delete" onclick="deleteRecord(\'' + r.id + '\')" title="حذف"><i class="fas fa-trash"></i></button>';
+          if (!window._isViewerMode) {
+            rows += '<button class="action-btn edit" onclick="editRecord(\'' + r.id + '\')" title="تعديل"><i class="fas fa-pen"></i></button>';
+            rows += '<button class="action-btn delete" onclick="deleteRecord(\'' + r.id + '\')" title="حذف"><i class="fas fa-trash"></i></button>';
+          }
           rows += '<button class="action-btn print" onclick="printSingle(\'' + r.id + '\')" title="طباعة"><i class="fas fa-print"></i></button>';
           rows += '</div></td></tr>';
         });
@@ -2449,8 +2451,8 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   } catch(e){}
 
-  function unlockWithdrawalSystem() {
-    localStorage.setItem('lotus_withdrawal_unlocked', 'true');
+  function unlockWithdrawalSystem(skipPersist) {
+    if (!skipPersist) localStorage.setItem('lotus_withdrawal_unlocked', 'true');
     var modal = document.getElementById('login-modal');
     if (modal) modal.classList.remove('active');
     var s = { username: 'admin', name: 'مسؤول النظام', role: 'admin', loginTime: Date.now() };
@@ -2458,15 +2460,40 @@ document.addEventListener('DOMContentLoaded', function() {
     renderEmps();
   }
 
-  // Check if unlocked previously (keeps unlocked across refresh and page changes)
-  var isUnlocked = localStorage.getItem('lotus_withdrawal_unlocked') === 'true';
-  var modal = document.getElementById('login-modal');
-  if (isUnlocked) {
+  function setupViewerMode() {
+    var modal = document.getElementById('login-modal');
     if (modal) modal.classList.remove('active');
-    var s = { username: 'admin', name: 'مسؤول النظام', role: 'admin', loginTime: Date.now() };
-    showUserMenu(s);
-    renderEmps();
-  } else {
+    // Hide all tabs except records
+    document.querySelectorAll('#tabNav .tab').forEach(function(tab) {
+      if (tab.dataset.pane === 'records') {
+        tab.classList.add('active');
+      } else {
+        tab.style.display = 'none';
+        tab.classList.remove('active');
+      }
+    });
+    // Activate records pane only
+    document.querySelectorAll('.pane').forEach(function(p) { p.classList.remove('active'); });
+    var recordsPane = document.getElementById('records');
+    if (recordsPane) recordsPane.classList.add('active');
+    // Render table when data is ready
+    setTimeout(function() { if (typeof renderTable === 'function') renderTable(); }, 500);
+  }
+
+  // ===== Mode Detection from URL =====
+  var _urlParams = new URLSearchParams(window.location.search);
+  var _pageMode = _urlParams.get('mode') || 'default';
+  window._isViewerMode = (_pageMode === 'viewer');
+  window._isAdminMode = (_pageMode === 'admin');
+
+  var modal = document.getElementById('login-modal');
+
+  if (window._isViewerMode) {
+    // ---- Viewer Mode: records tab only, no login needed ----
+    setupViewerMode();
+
+  } else if (window._isAdminMode) {
+    // ---- Admin Mode: always require password, no localStorage persistence ----
     if (modal) modal.classList.add('active');
     var loginBtn = document.getElementById('login-submit-btn');
     var passInput = document.getElementById('withdrawal-admin-password');
@@ -2474,21 +2501,53 @@ document.addEventListener('DOMContentLoaded', function() {
     if (loginBtn) {
       loginBtn.onclick = function() {
         var entered = passInput ? passInput.value.trim() : '';
-        var actual = getWithdrawalPass();
         if (!entered) {
           if (errEl) { errEl.textContent = 'يرجى كتابة كلمة السر للمتابعة'; errEl.style.display = 'block'; }
           return;
         }
-        if (entered === actual || entered === 'admin123' || entered === 'bo2002') {
+        if (entered === 'bo2002') {
           if (errEl) errEl.style.display = 'none';
-          unlockWithdrawalSystem();
+          unlockWithdrawalSystem(true); // true = don't persist, ask on refresh
         } else {
-          if (errEl) { errEl.textContent = '❌ كلمة السر غير صحيحة، يرجى المحاولة مرة أخرى'; errEl.style.display = 'block'; }
+          if (errEl) { errEl.textContent = '❌ كلمة السر غير صحيحة'; errEl.style.display = 'block'; }
           if (passInput) { passInput.value = ''; passInput.focus(); }
         }
       };
     }
     setTimeout(function(){ if (passInput) passInput.focus(); }, 200);
+
+  } else {
+    // ---- Default Mode: existing behavior ----
+    var isUnlocked = localStorage.getItem('lotus_withdrawal_unlocked') === 'true';
+    if (isUnlocked) {
+      if (modal) modal.classList.remove('active');
+      var s = { username: 'admin', name: 'مسؤول النظام', role: 'admin', loginTime: Date.now() };
+      showUserMenu(s);
+      renderEmps();
+    } else {
+      if (modal) modal.classList.add('active');
+      var loginBtn = document.getElementById('login-submit-btn');
+      var passInput = document.getElementById('withdrawal-admin-password');
+      var errEl = document.getElementById('login-error');
+      if (loginBtn) {
+        loginBtn.onclick = function() {
+          var entered = passInput ? passInput.value.trim() : '';
+          var actual = getWithdrawalPass();
+          if (!entered) {
+            if (errEl) { errEl.textContent = 'يرجى كتابة كلمة السر للمتابعة'; errEl.style.display = 'block'; }
+            return;
+          }
+          if (entered === actual || entered === 'admin123' || entered === 'bo2002') {
+            if (errEl) errEl.style.display = 'none';
+            unlockWithdrawalSystem();
+          } else {
+            if (errEl) { errEl.textContent = '❌ كلمة السر غير صحيحة، يرجى المحاولة مرة أخرى'; errEl.style.display = 'block'; }
+            if (passInput) { passInput.value = ''; passInput.focus(); }
+          }
+        };
+      }
+      setTimeout(function(){ if (passInput) passInput.focus(); }, 200);
+    }
   }
   // Register login/logout callbacks for auth.js
   window.AUTH_ON_LOGIN_CALLBACK = function(emp) {
