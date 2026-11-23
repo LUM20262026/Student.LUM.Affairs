@@ -373,6 +373,20 @@ main,header{position:relative;z-index:1}
     0% { background-position: 200% 0; }
     100% { background-position: -200% 0; }
 }
+
+/* Active conscription card, same tilt, glow and entrance motion as other cards. */
+.conscription-active{--c1:#06b6d4;--c2:#8b5cf6;cursor:pointer;padding-bottom:56px;background:linear-gradient(145deg,rgba(6,182,212,.18),rgba(139,92,246,.15));border-color:rgba(34,211,238,.38)}
+.conscription-active .go{color:var(--text);text-decoration:none}
+.admin-key-btn{opacity:1!important;width:34px;height:34px;color:#ffe19a;background:rgba(245,196,81,.15);border-color:rgba(245,196,81,.5)}
+.conscription-active .conscription-key{opacity:1;width:34px;height:34px;color:#ffe19a;background:rgba(245,196,81,.15);border-color:rgba(245,196,81,.5)}
+.conscription-active .conscription-key:focus-visible,.conscription-active .go:focus-visible{outline:3px solid var(--gold);outline-offset:4px}
+
+html{background:#0a1029}body{min-height:100vh}
+/* Uniform card actions and small upper-left keys. */
+.grid{align-items:stretch}
+.sys-card{padding-bottom:1.25rem}
+.sys-card .go{margin-top:auto;min-height:38px;box-sizing:border-box;justify-content:center;white-space:nowrap;font-size:.8rem;padding:.45rem .8rem}
+.admin-key-btn,.conscription-active .conscription-key{top:12px!important;bottom:auto!important;left:12px!important;width:27px!important;height:27px!important;font-size:.78rem!important}
 </style>
 </head>
 <body>
@@ -454,19 +468,19 @@ main,header{position:relative;z-index:1}
       <span class="go">فتح النظام <i class="bi bi-arrow-up-left"></i></span>
     </a>
 
-    <!-- 04: نظام إدارة التجنيد (قريباً) -->
-    <div class="sys-card t5 soon" aria-disabled="true">
-      <span class="ribbon">قريباً</span>
+    <!-- 04: نظام إدارة التجنيد -->
+    <article class="sys-card t5 conscription-active" id="conscription-card" onclick="if(!event.target.closest('a,button'))window.open('https://lum20262026.github.io/TagnedViewOnly/','_blank','noopener,noreferrer')">
       <span class="num">04</span>
       <div class="ico">
         <i class="bi bi-flag-fill"></i>
-        <span class="badge-ico"><i class="bi bi-clock-history"></i></span>
+        <span class="badge-ico"><i class="bi bi-shield-check"></i></span>
       </div>
       <h3>إدارة التجنيد</h3>
-      <p>نظام إدارة التجنيد والمتابعة العسكرية — قيد التجهيز</p>
-      <div class="tags"><span class="tag">قريباً</span></div>
-      <span class="go"><i class="bi bi-hourglass-split"></i> قريباً</span>
-    </div>
+      <p>نظام إدارة التجنيد والمتابعة العسكرية</p>
+      <div class="tags"><span class="tag">التجنيد</span></div>
+      <a class="go" href="https://lum20262026.github.io/TagnedViewOnly/" target="_blank" rel="noopener noreferrer">فتح النظام <i class="bi bi-arrow-up-left"></i></a>
+      <button type="button" class="admin-key-btn conscription-key" aria-label="مفتاح الأدمن — غير مربوط حاليًا" title="مفتاح الأدمن غير مربوط حاليًا" onclick="event.stopPropagation();openConscriptionAdmin()"><i class="bi bi-key-fill"></i></button>
+    </article>
 
     <!-- 05: إدارة سحب الملفات -->
     <div class="sys-card t-withdraw" style="cursor:pointer" onclick="window.open('systems/file-withdrawal/index.html?mode=viewer','_blank')">
@@ -478,7 +492,7 @@ main,header{position:relative;z-index:1}
       <h3>سحب الملفات</h3>
       <p>عرض سجلات سحب الملفات ومتابعة الحالة</p>
       <div class="tags"><span class="tag">سحب الملفات</span><span class="tag">السجلات</span></div>
-      <span class="go">فتح السجلات <i class="bi bi-arrow-up-left"></i></span>
+      <span class="go">فتح النظام <i class="bi bi-arrow-up-left"></i></span>
       <button class="admin-key-btn" onclick="event.stopPropagation();document.getElementById('withdraw-admin-modal').style.display='flex';setTimeout(function(){document.getElementById('withdraw-admin-pw').focus()},150)" title="دخول المختص (أدمن)">
         <i class="bi bi-key-fill"></i>
       </button>
@@ -525,10 +539,47 @@ main,header{position:relative;z-index:1}
   </div>
 </div>
 <script>
-function checkWithdrawAdmin(){
+
+// Local convenience password screen, not backend authorization.
+const CONSCRIPTION_ADMIN_URL = 'https://lum20262026.github.io/Tagned/';
+async function portalPasswordDigest(value){
+ const bytes=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(value));
+ return Array.from(new Uint8Array(bytes),b=>b.toString(16).padStart(2,'0')).join('');
+}
+function openConscriptionAdmin(){
+ document.getElementById('conscription-admin-error').style.display='none';
+ document.getElementById('conscription-admin-pw').value='';
+ document.getElementById('conscription-admin-modal').style.display='flex';
+ setTimeout(()=>document.getElementById('conscription-admin-pw').focus(),150);
+}
+const CONSCRIPTION_PASSWORD_SALT = '279d035b0a8bbf9b78a212cf88b686e3';
+const CONSCRIPTION_PASSWORD_HASH = 'b52706794ee639fb363165612feda9a31271a822d44d6cce01637c7c7bc4fe36';
+async function checkConscriptionAdmin(){
+ const input=document.getElementById('conscription-admin-pw'),button=document.getElementById('conscription-admin-go'),message=document.getElementById('conscription-admin-error');
+ if(button.disabled)return;
+ const password=input.value;input.value='';button.disabled=true;message.style.display='none';
+ const targetTab=window.open('about:blank','_blank');if(targetTab)targetTab.opener=null;
+ try{
+  const key=await crypto.subtle.importKey('raw',new TextEncoder().encode(password),'PBKDF2',false,['deriveBits']);
+  const salt=Uint8Array.from(CONSCRIPTION_PASSWORD_SALT.match(/../g),h=>parseInt(h,16));
+  const bits=await crypto.subtle.deriveBits({name:'PBKDF2',salt,iterations:210000,hash:'SHA-256'},key,256);
+  const hash=Array.from(new Uint8Array(bits),b=>b.toString(16).padStart(2,'0')).join('');
+  if(hash!==CONSCRIPTION_PASSWORD_HASH){message.textContent='كلمة السر غير صحيحة';message.style.color='#ff90a5';}
+  else if(!CONSCRIPTION_ADMIN_URL){message.textContent='كلمة السر صحيحة. صفحة التعديل لم تُربط بعد.';message.style.color='#79e6bf';}
+  else{if(targetTab){targetTab.location.replace(CONSCRIPTION_ADMIN_URL);document.getElementById('conscription-admin-modal').style.display='none';return;}message.textContent='اسمح بالنوافذ المنبثقة ثم أعد المحاولة لفتح النظام في تاب جديد.';message.style.color='#ff90a5';}
+  if(targetTab)targetTab.close();message.style.display='block';
+ }catch(e){if(targetTab)targetTab.close();message.textContent='تعذر التحقق في هذا المتصفح. افتح الملف في Chrome أو عبر HTTPS.';message.style.display='block';}
+ finally{button.disabled=false;}
+}
+document.addEventListener('keydown',function(e){if(e.key==='Escape'){
+ const m=document.getElementById('conscription-admin-modal');m.style.display='none';
+ document.getElementById('conscription-admin-pw').value='';document.getElementById('conscription-admin-error').style.display='none';
+}});
+
+async function checkWithdrawAdmin(){
   var pw=document.getElementById('withdraw-admin-pw').value.trim();
   var err=document.getElementById('withdraw-admin-error');
-  if(pw==='bo2002'){
+  if(await portalPasswordDigest(pw)==='ad79508d138696e3bf1af318794d669d89b5e78a80cc7106cb5c84f95daf0749'){
     err.style.display='none';
     document.getElementById('withdraw-admin-modal').style.display='none';
     document.getElementById('withdraw-admin-pw').value='';
@@ -542,6 +593,20 @@ function checkWithdrawAdmin(){
 </script>
 
   </div></main>
+<div id="conscription-admin-modal" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.75);z-index:10000;justify-content:center;align-items:center;backdrop-filter:blur(8px)">
+  <div style="background:linear-gradient(160deg,#141b38,#0a1029);border:1px solid rgba(245,196,81,.35);border-radius:22px;padding:30px 34px;text-align:center;width:330px;box-shadow:0 25px 70px rgba(0,0,0,.65),0 0 30px rgba(245,196,81,.15)">
+    <div style="width:56px;height:56px;margin:0 auto 14px;border-radius:50%;background:rgba(245,196,81,.12);display:grid;place-items:center;font-size:1.7rem;color:var(--gold);border:1px solid rgba(245,196,81,.3)"><i class="bi bi-shield-lock-fill"></i></div>
+    <h4 style="color:#fff;font-weight:800;margin-bottom:5px;font-size:1.1rem">دخول أدمن التجنيد</h4>
+    <p style="color:var(--muted);font-size:.8rem;margin-bottom:16px">أدخل كلمة سر الأدمن لفتح صفحة إدارة التجنيد.</p>
+    <div id="conscription-admin-error" style="display:none;background:rgba(244,63,94,.12);border:1px solid rgba(244,63,94,.3);border-radius:10px;padding:7px 10px;margin-bottom:12px;color:#f43f5e;font-size:.8rem;font-weight:600">لم يتم ربط صفحة التعديل أو تفعيل التحقق من كلمة المرور بعد.</div>
+    <input autocomplete="off" type="password" id="conscription-admin-pw" placeholder="كلمة سر الأدمن" style="width:100%;padding:11px 14px;border-radius:12px;border:1px solid rgba(255,255,255,.15);background:rgba(255,255,255,.07);color:#fff;text-align:center;font-size:1.05rem;letter-spacing:2px;margin-bottom:14px;outline:none;font-family:inherit" onkeydown="if(event.key==='Enter')document.getElementById('conscription-admin-go').click()">
+    <div style="display:flex;gap:8px">
+      <button id="conscription-admin-go" onclick="checkConscriptionAdmin()" style="flex:1;padding:10px;border-radius:12px;border:none;background:linear-gradient(135deg,var(--gold),var(--pink));color:#fff;font-weight:700;cursor:pointer;font-size:.9rem;font-family:inherit;transition:all .3s">متابعة <i class="bi bi-arrow-left"></i></button>
+      <button onclick="document.getElementById('conscription-admin-modal').style.display='none';document.getElementById('conscription-admin-pw').value='';document.getElementById('conscription-admin-error').style.display='none'" style="flex:.6;padding:10px;border-radius:12px;border:1px solid rgba(255,255,255,.15);background:transparent;color:var(--muted);cursor:pointer;font-size:.85rem;font-family:inherit;transition:all .3s">إلغاء</button>
+    </div>
+  </div>
+</div>
+
 
 <!-- ========== BACKUP PROGRESS MODAL ========== -->
 <div id="shutdown-modal" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.85);z-index:20000;justify-content:center;align-items:center;backdrop-filter:blur(8px);">
